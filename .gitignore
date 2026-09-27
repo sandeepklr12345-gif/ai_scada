@@ -1,0 +1,21 @@
+@"
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Datasets
+data/
+
+# Environment files
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+"@ | Set-Content .gitignore
