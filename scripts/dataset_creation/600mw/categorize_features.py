@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 INPUT_FILE = (
     PROJECT_ROOT
@@ -174,7 +174,39 @@ for category, features in categories.items():
 
 feature_map = pd.DataFrame(rows)
 
+# --------------------------------------------------
+# Feature-name normalization for validation
+# --------------------------------------------------
 
+def normalize_column_name(name):
+    name = (
+        str(name)
+        .replace("\n", " ")
+        .replace("\r", " ")
+        .replace("（", "(")
+        .replace("）", ")")
+        .strip()
+        .lower()
+    )
+
+    # Remove measurement units from dataset column names
+    units = [
+        "(℃)",
+        "(mpa)",
+        "(mw)",
+        "(t/h)",
+        "(%)",
+        "(g/kwh)",
+        "(kj/kwh)"
+    ]
+
+    for unit in units:
+        name = name.replace(unit, "")
+
+    # Remove extra whitespace
+    name = " ".join(name.split())
+
+    return name.strip()
 # --------------------------------------------------
 # 4. Check that all numeric variables are mapped
 # --------------------------------------------------
@@ -185,19 +217,44 @@ numeric_columns = [
     if column != "Time"
 ]
 
+dataset_features = set(numeric_columns)
 
 mapped_features = set(
     feature_map["feature_name"]
 )
 
-dataset_features = set(
-    numeric_columns
+# Normalize names only for validation.
+# Original names are preserved in the saved feature map.
+
+normalized_dataset = {
+    normalize_column_name(name): name
+    for name in dataset_features
+}
+
+normalized_mapped = {
+    normalize_column_name(name): name
+    for name in mapped_features
+}
+
+missing_from_map_normalized = (
+    set(normalized_dataset.keys())
+    - set(normalized_mapped.keys())
 )
 
+extra_in_map_normalized = (
+    set(normalized_mapped.keys())
+    - set(normalized_dataset.keys())
+)
 
-missing_from_map = dataset_features - mapped_features
+missing_from_map = [
+    normalized_dataset[name]
+    for name in missing_from_map_normalized
+]
 
-extra_in_map = mapped_features - dataset_features
+extra_in_map = [
+    normalized_mapped[name]
+    for name in extra_in_map_normalized
+]
 
 
 print("\n" + "-" * 80)
@@ -227,6 +284,8 @@ if extra_in_map:
     print("\nFeatures in map but NOT dataset:")
     for feature in sorted(extra_in_map):
         print("-", feature)
+else:
+    print("\nAll mapped features exist in dataset.")
 
 
 # --------------------------------------------------
