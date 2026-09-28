@@ -1,4 +1,3 @@
-@"
 # Python
 __pycache__/
 *.pyc
@@ -6,7 +5,9 @@ __pycache__/
 venv/
 
 # Datasets
-data/
+data/*
+!data/raw/
+!data/raw/**
 
 # Environment files
 .env
@@ -18,4 +19,3 @@ data/
 # OS
 .DS_Store
 Thumbs.db
-"@ | Set-Content .gitignore
