@@ -1,0 +1,48 @@
+{
+  "dataset": "600 MW Unit One-Week Operating Data",
+  "role": "Primary power-output forecasting / load-estimation component",
+  "model_family": "LinearRegression",
+  "feature_set": "D leakage-safe",
+  "feature_count": 119,
+  "targets": [
+    "target_power_2min",
+    "target_power_10min",
+    "target_power_30min"
+  ],
+  "models": {
+    "target_power_2min": {
+      "model_path": "models\\forecasting\\600mw\\600mw_2min_final.joblib",
+      "training_rows": 5649,
+      "feature_count": 119,
+      "model_type": "LinearRegression"
+    },
+    "target_power_10min": {
+      "model_path": "models\\forecasting\\600mw\\600mw_10min_final.joblib",
+      "training_rows": 5649,
+      "feature_count": 119,
+      "model_type": "LinearRegression"
+    },
+    "target_power_30min": {
+      "model_path": "models\\forecasting\\600mw\\600mw_30min_final.joblib",
+      "training_rows": 5649,
+      "feature_count": 119,
+      "model_type": "LinearRegression"
+    }
+  },
+  "validation_summary": {
+    "2_min": {
+      "temporal_robustness_mean_r2": 0.998253,
+      "temporal_robustness_mean_rmse": 3.639241
+    },
+    "10_min": {
+      "temporal_robustness_mean_r2": 0.974143,
+      "temporal_robustness_mean_rmse": 12.59873
+    },
+    "30_min": {
+      "temporal_robustness_mean_r2": 0.814217,
+      "temporal_robustness_mean_rmse": 34.491407
+    }
+  },
+  "status": "FROZEN FOR INTEGRATION",
+  "note": "Validation statistics are from chronological holdout folds. Final models are retrained on all valid rows using the validated 119-feature schema."
+}
