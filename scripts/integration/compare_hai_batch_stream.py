@@ -247,14 +247,41 @@ compare["score_difference"] = (
     - compare["stream_score"]
 ).abs()
 
-compare["prediction_match"] = (
-    compare["batch_prediction"]
-    == compare["stream_prediction"]
+# ============================================================
+# VALID ROW COMPARISON
+# ============================================================
+
+valid_rows = (
+    (compare["batch_status"] != "INSUFFICIENT_HISTORY")
+    &
+    (compare["stream_status"] != "INSUFFICIENT_HISTORY")
 )
 
-compare["status_match"] = (
-    compare["batch_status"]
-    == compare["stream_status"]
+compare["prediction_match"] = True
+compare["status_match"] = True
+
+compare.loc[valid_rows, "prediction_match"] = (
+    compare.loc[
+        valid_rows,
+        "batch_prediction"
+    ]
+    ==
+    compare.loc[
+        valid_rows,
+        "stream_prediction"
+    ]
+)
+
+compare.loc[valid_rows, "status_match"] = (
+    compare.loc[
+        valid_rows,
+        "batch_status"
+    ]
+    ==
+    compare.loc[
+        valid_rows,
+        "stream_status"
+    ]
 )
 
 

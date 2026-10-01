@@ -262,10 +262,66 @@ def main():
                 ].dtypes
             )
 
+        # --------------------------------------------------------
+        # Ensure model input is explicitly numeric
+        # --------------------------------------------------------
+
+        model_input = model_input.copy()
+
+        model_input[feature_columns] = (
+            model_input[feature_columns]
+            .apply(
+                pd.to_numeric,
+                errors="raise"
+            )
+        )
+
+        # Diagnostic for first row
+        if index == 0:
+
+            print("\nMODEL INPUT DTYPE CHECK")
+
+            non_numeric = [
+                column
+                for column in feature_columns
+                if not pd.api.types.is_numeric_dtype(
+                    model_input[column]
+                )
+            ]
+
+            print(
+                f"Total features : {len(feature_columns)}"
+            )
+
+            print(
+                f"Non-numeric    : {len(non_numeric)}"
+            )
+
+            if non_numeric:
+
+                print(
+                    "Non-numeric features:"
+                )
+
+                for column in non_numeric:
+                    print(
+                        f"  {column}: "
+                        f"{model_input[column].dtype}"
+                    )
+
+            print(
+                "\nFirst 5 dtypes:"
+            )
+
+            print(
+                model_input[
+                    feature_columns[:5]
+                ].dtypes
+            )
+
         prediction = forecaster.predict(
             model_input
         )
-
         result_row = {
             "timestamp":
                 row["timestamp"],

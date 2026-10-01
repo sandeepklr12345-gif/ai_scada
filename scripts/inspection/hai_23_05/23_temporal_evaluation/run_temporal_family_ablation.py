@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from sklearn.ensemble import IsolationForest
+
 from sklearn.metrics import (
     confusion_matrix,
     precision_score,
@@ -12,18 +13,15 @@ from sklearn.metrics import (
     accuracy_score
 )
 
-
 # ============================================================
 # STAGE 23E
 # HAI 23.05 - Temporal Feature Family Ablation
 # ============================================================
 
-ROOT = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 TEMPORAL_DIR = (
-    ROOT
+    PROJECT_ROOT
     / "data"
     / "features"
     / "hai"

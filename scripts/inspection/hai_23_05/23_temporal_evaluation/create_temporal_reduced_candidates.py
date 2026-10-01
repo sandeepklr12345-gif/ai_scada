@@ -9,12 +9,10 @@ import numpy as np
 # HAI 23.05 - Training-Only Temporal Feature Reduction
 # ============================================================
 
-ROOT = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 TEMPORAL_DIR = (
-    ROOT
+    PROJECT_ROOT
     / "data"
     / "features"
     / "hai"

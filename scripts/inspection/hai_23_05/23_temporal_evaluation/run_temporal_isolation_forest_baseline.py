@@ -1,9 +1,11 @@
 from pathlib import Path
 
 import pandas as pd
+
 import numpy as np
 
 from sklearn.ensemble import IsolationForest
+
 from sklearn.metrics import (
     confusion_matrix,
     precision_score,
@@ -12,18 +14,15 @@ from sklearn.metrics import (
     accuracy_score
 )
 
-
 # ============================================================
 # STAGE 23B
 # HAI 23.05 - Temporal Isolation Forest Baseline
 # ============================================================
 
-ROOT = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 TEMPORAL_DIR = (
-    ROOT
+    PROJECT_ROOT
     / "data"
     / "features"
     / "hai"
@@ -60,8 +59,6 @@ RESULTS_FILE = (
     OUTPUT_DIR
     / "hai_2305_temporal_isolation_forest_results.csv"
 )
-
-
 # ============================================================
 # MODEL CONFIGURATION
 # ============================================================

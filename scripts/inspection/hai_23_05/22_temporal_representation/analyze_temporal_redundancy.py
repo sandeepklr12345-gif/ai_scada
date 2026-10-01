@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pandas as pd
 import numpy as np
 
@@ -8,17 +9,25 @@ import numpy as np
 # HAI 23.05 - Temporal Feature Redundancy Analysis
 # ============================================================
 
-INPUT_FILE = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-    r"\data\features\hai\hai-23.05"
-    r"\temporal_representation"
-    r"\hai_2305_training_temporal_features.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+INPUT_FILE = (
+    PROJECT_ROOT
+    / "data"
+    / "features"
+    / "hai"
+    / "hai-23.05"
+    / "temporal_representation"
+    / "hai_2305_training_temporal_features.csv"
 )
 
-OUTPUT_DIR = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-    r"\data\features\hai\hai-23.05"
-    r"\temporal_representation"
+OUTPUT_DIR = (
+    PROJECT_ROOT
+    / "data"
+    / "features"
+    / "hai"
+    / "hai-23.05"
+    / "temporal_representation"
 )
 
 CORR_MATRIX_FILE = (

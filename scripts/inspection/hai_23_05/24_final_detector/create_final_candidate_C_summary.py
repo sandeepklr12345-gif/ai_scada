@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import pandas as pd
 import numpy as np
@@ -7,7 +8,8 @@ import numpy as np
 # STAGE 24G: FINAL CANDIDATE C CONSOLIDATED SUMMARY
 # ============================================================
 
-BASE_DIR = r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+BASE_DIR = str(PROJECT_ROOT)
 
 FINAL_DIR = os.path.join(
     BASE_DIR,

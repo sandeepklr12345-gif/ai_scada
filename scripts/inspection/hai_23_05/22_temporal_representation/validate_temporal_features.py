@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pandas as pd
 import numpy as np
 
@@ -8,18 +9,23 @@ import numpy as np
 # HAI 23.05 - Temporal Feature Quality Validation
 # ============================================================
 
-INPUT_FILE = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-    r"\data\features\hai\hai-23.05"
-    r"\temporal_representation"
-    r"\hai_2305_training_temporal_features.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+TEMPORAL_DIR = (
+    PROJECT_ROOT
+    / "data"
+    / "features"
+    / "hai"
+    / "hai-23.05"
+    / "temporal_representation"
 )
 
-OUTPUT_DIR = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-    r"\data\features\hai\hai-23.05"
-    r"\temporal_representation"
+INPUT_FILE = (
+    TEMPORAL_DIR
+    / "hai_2305_training_temporal_features.csv"
 )
+
+OUTPUT_DIR = TEMPORAL_DIR
 
 QUALITY_FILE = (
     OUTPUT_DIR
@@ -30,7 +36,6 @@ SUMMARY_FILE = (
     OUTPUT_DIR
     / "hai_2305_temporal_feature_quality_summary.csv"
 )
-
 
 print("=" * 70)
 print("STAGE 22C: TEMPORAL FEATURE QUALITY VALIDATION")

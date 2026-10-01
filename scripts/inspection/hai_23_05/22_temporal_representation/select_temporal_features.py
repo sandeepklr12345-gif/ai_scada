@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pandas as pd
 import numpy as np
 
@@ -8,12 +9,10 @@ import numpy as np
 # HAI 23.05 - Temporal Feature Selection
 # ============================================================
 
-ROOT = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 TEMPORAL_DIR = (
-    ROOT
+    PROJECT_ROOT
     / "data"
     / "features"
     / "hai"

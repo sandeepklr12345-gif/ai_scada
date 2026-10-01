@@ -1,9 +1,11 @@
+from pathlib import Path
 import os
 import sys
 import pandas as pd
 
 
-BASE_DIR = r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+BASE_DIR = str(PROJECT_ROOT)
 
 SCRIPT_DIR = os.path.join(
     BASE_DIR,

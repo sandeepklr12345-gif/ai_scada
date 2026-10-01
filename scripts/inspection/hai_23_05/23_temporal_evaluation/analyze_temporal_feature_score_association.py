@@ -11,12 +11,10 @@ from scipy.stats import pearsonr, spearmanr
 # HAI 23.05 - Temporal Feature / Score Association Analysis
 # ============================================================
 
-ROOT = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 TEMPORAL_DIR = (
-    ROOT
+    PROJECT_ROOT
     / "data"
     / "features"
     / "hai"
@@ -64,7 +62,6 @@ FAMILY_SUMMARY_FILE = (
     OUTPUT_DIR
     / "hai_2305_temporal_feature_family_score_association.csv"
 )
-
 
 print("=" * 70)
 print("STAGE 23D: TEMPORAL FEATURE / SCORE ASSOCIATION ANALYSIS")

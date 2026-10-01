@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pandas as pd
 import numpy as np
 
@@ -9,16 +10,25 @@ import numpy as np
 # Boundary-Aware Version
 # ============================================================
 
-INPUT_FILE = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-    r"\data\features\hai\hai-23.05\model_ready"
-    r"\hai_2305_training_model_ready.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+INPUT_FILE = (
+    PROJECT_ROOT
+    / "data"
+    / "features"
+    / "hai"
+    / "hai-23.05"
+    / "model_ready"
+    / "hai_2305_training_model_ready.csv"
 )
 
-OUTPUT_DIR = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-    r"\data\features\hai\hai-23.05"
-    r"\temporal_representation"
+OUTPUT_DIR = (
+    PROJECT_ROOT
+    / "data"
+    / "features"
+    / "hai"
+    / "hai-23.05"
+    / "temporal_representation"
 )
 
 OUTPUT_FILE = (

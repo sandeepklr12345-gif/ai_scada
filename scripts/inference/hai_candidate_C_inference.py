@@ -3,7 +3,10 @@ import argparse
 import joblib
 import numpy as np
 import pandas as pd
+import sys
+from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 class HAICandidateCInference:
     """
@@ -850,8 +853,16 @@ def run_diagnose(engine, test_path, chunk_size=1000):
 
 
 if __name__ == "__main__":
-    BASE_DIR=r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-    FINAL_DIR=os.path.join(BASE_DIR,"data","features","hai","hai-23.05","temporal_representation","final_candidate")
+    BASE_DIR = PROJECT_ROOT
+    FINAL_DIR = os.path.join(
+        BASE_DIR,
+        "data",
+        "features",
+        "hai",
+        "hai-23.05",
+        "temporal_representation",
+        "final_candidate"
+    )
     MODEL_PATH=os.path.join(FINAL_DIR,"hai_2305_candidate_C_isolation_forest.joblib")
     MANIFEST_PATH=os.path.join(FINAL_DIR,"hai_2305_candidate_C_feature_manifest.csv")
     TEST1_PATH=os.path.join(BASE_DIR,"data","features","hai","hai-23.05","temporal_representation","hai-test1_temporal_model_ready.csv")

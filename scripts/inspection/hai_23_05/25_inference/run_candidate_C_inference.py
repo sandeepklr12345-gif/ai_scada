@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import joblib
 import pandas as pd
@@ -8,7 +9,8 @@ import numpy as np
 # STAGE 25A: FINAL CANDIDATE C INFERENCE PIPELINE
 # ============================================================
 
-BASE_DIR = r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+BASE_DIR = str(PROJECT_ROOT)
 
 FINAL_DIR = os.path.join(
     BASE_DIR,

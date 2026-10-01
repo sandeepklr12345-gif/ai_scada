@@ -1,0 +1,15 @@
+# Core data, feature, and frozen-model pipeline
+joblib
+numpy
+pandas
+scikit-learn
+
+# Excel workbook ingestion and cleaning
+openpyxl
+
+# Statistical analysis and forecast-validation plots
+scipy
+matplotlib
+
+# PostgreSQL reader and SCADA contract integration
+psycopg2-binary

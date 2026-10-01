@@ -1,14 +1,15 @@
+from pathlib import Path
 import os
 import joblib
 import numpy as np
 import pandas as pd
 
-
 # ============================================================
 # STAGE 24E: FINAL CANDIDATE C ERROR GROUP ANALYSIS
 # ============================================================
 
-BASE_DIR = r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+BASE_DIR = str(PROJECT_ROOT)
 
 FINAL_DIR = os.path.join(
     BASE_DIR,

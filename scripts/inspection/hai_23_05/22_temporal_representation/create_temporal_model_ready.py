@@ -2,18 +2,10 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-
-# ============================================================
-# STAGE 22H
-# HAI 23.05 - Final Temporal Model-Ready Dataset
-# ============================================================
-
-ROOT = Path(
-    r"C:\Users\sandeep\OneDrive\Documents\Ai_Scada"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 BASE_DIR = (
-    ROOT
+    PROJECT_ROOT
     / "data"
     / "features"
     / "hai"

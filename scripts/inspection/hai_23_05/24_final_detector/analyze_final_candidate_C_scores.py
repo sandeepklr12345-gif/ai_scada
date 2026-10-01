@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import joblib
 import numpy as np
@@ -7,7 +8,17 @@ print("=" * 70)
 print("STAGE 24D: FINAL CANDIDATE C SCORE ANALYSIS")
 print("=" * 70)
 
-BASE = r"data/features/hai/hai-23.05/temporal_representation/final_candidate"
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+BASE = os.path.join(
+    str(PROJECT_ROOT),
+    "data",
+    "features",
+    "hai",
+    "hai-23.05",
+    "temporal_representation",
+    "final_candidate"
+)
 
 TRAIN_FILE = os.path.join(
     BASE,
