@@ -13,3 +13,12 @@ matplotlib
 
 # PostgreSQL reader and SCADA contract integration
 psycopg2-binary
+
+# FastAPI runtime and its local ASGI server
+fastapi
+uvicorn
+pydantic
+
+# MQTT replay integration and subscriber HTTP requests
+paho-mqtt>=2.0
+requests

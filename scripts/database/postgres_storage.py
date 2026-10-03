@@ -186,6 +186,150 @@ class PostgreSQLStorage:
             if connection is not None:
                 connection.close()
 
+
+        # --------------------------------------------------------
+    # GET LATEST MEASUREMENT
+    # --------------------------------------------------------
+
+    def get_latest_measurement(
+        self,
+        source_id=None,
+        equipment_id=None,
+        parameter_id=None,
+    ):
+        connection = None
+
+        try:
+            connection = self._connect()
+
+            query = """
+                SELECT
+                    measurement_id,
+                    timestamp,
+                    source_id,
+                    equipment_id,
+                    parameter_id,
+                    value,
+                    quality_status
+                FROM measurements
+                WHERE 1 = 1
+            """
+
+            params = []
+
+            if source_id is not None:
+                query += " AND source_id = %s"
+                params.append(source_id)
+
+            if equipment_id is not None:
+                query += " AND equipment_id = %s"
+                params.append(equipment_id)
+
+            if parameter_id is not None:
+                query += " AND parameter_id = %s"
+                params.append(parameter_id)
+
+            query += """
+                ORDER BY measurement_id DESC
+                LIMIT 1;
+            """
+
+            with connection.cursor() as cursor:
+                cursor.execute(query, tuple(params))
+                row = cursor.fetchone()
+
+            if row is None:
+                return None
+
+            return {
+                "measurement_id": row[0],
+                "timestamp": row[1],
+                "source_id": row[2],
+                "equipment_id": row[3],
+                "parameter_id": row[4],
+                "value": float(row[5]),
+                "quality_status": row[6],
+            }
+
+        finally:
+            if connection is not None:
+                connection.close()
+
+    # --------------------------------------------------------
+    # GET LATEST PREDICTIONS
+    # --------------------------------------------------------
+
+    def get_latest_predictions(
+        self,
+        source_id=None,
+        equipment_id=None,
+        prediction_type="power_forecast",
+    ):
+        connection = None
+
+        try:
+            connection = self._connect()
+
+            query = """
+                SELECT
+                    prediction_id,
+                    timestamp,
+                    source_id,
+                    equipment_id,
+                    model_name,
+                    prediction_type,
+                    predicted_value,
+                    confidence,
+                    risk_level,
+                    prediction_horizon_minutes,
+                    description
+                FROM ai_predictions
+                WHERE prediction_type = %s
+            """
+
+            params = [prediction_type]
+
+            if source_id is not None:
+                query += " AND source_id = %s"
+                params.append(source_id)
+
+            if equipment_id is not None:
+                query += " AND equipment_id = %s"
+                params.append(equipment_id)
+
+            query += """
+                ORDER BY timestamp DESC, prediction_horizon_minutes ASC
+                LIMIT 3;
+            """
+
+            with connection.cursor() as cursor:
+                cursor.execute(query, tuple(params))
+                rows = cursor.fetchall()
+
+            return [
+                {
+                    "prediction_id": row[0],
+                    "timestamp": row[1],
+                    "source_id": row[2],
+                    "equipment_id": row[3],
+                    "model_name": row[4],
+                    "prediction_type": row[5],
+                    "predicted_value": float(row[6]),
+                    "confidence": (
+                        float(row[7])
+                        if row[7] is not None
+                        else None
+                    ),
+                    "risk_level": row[8],
+                    "prediction_horizon_minutes": row[9],
+                    "description": row[10],
+                }
+                for row in rows
+            ]
+
+        finally:
+            if connection is not None:
+                connection.close()
     # --------------------------------------------------------
     # SAVE ALARM / EVENT
     # --------------------------------------------------------

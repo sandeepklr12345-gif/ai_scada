@@ -1,3 +1,5 @@
+import os
+
 import psycopg2
 import pandas as pd
 
@@ -7,11 +9,11 @@ import pandas as pd
 # ============================================================
 
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "database": "ai_scada",
-    "user": "postgres",
-    "password": "asdfghjkl;'",
+    "host": os.getenv("AI_SCADA_DB_HOST", "localhost"),
+    "port": int(os.getenv("AI_SCADA_DB_PORT", "5432")),
+    "database": os.getenv("AI_SCADA_DB_NAME", "ai_scada"),
+    "user": os.getenv("AI_SCADA_DB_USER", "postgres"),
+    "password": os.getenv("AI_SCADA_DB_PASSWORD"),
 }
 
 

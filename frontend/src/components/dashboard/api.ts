@@ -28,7 +28,9 @@ export type ApiSnapshot = {
   checkedAt: Date | null
 }
 
-const apiBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || '/api'
+const apiBase =
+  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ||
+  'http://127.0.0.1:8000'
 
 async function getJson<T>(path: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(`${apiBase}${path}`, {

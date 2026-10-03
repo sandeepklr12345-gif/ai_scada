@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 import time
-
+from datetime import datetime, timedelta
 import pandas as pd
 import paho.mqtt.client as mqtt
 
@@ -108,6 +108,14 @@ def main():
     # --------------------------------------------------------
 
     df = load_replay()
+        # Convert source timestamps to a modern simulation timeline
+    original_start = pd.to_datetime(df["timestamp"].iloc[0])
+    simulation_start = datetime.now().replace(microsecond=0)
+
+    df["timestamp"] = [
+        simulation_start + (ts - original_start)
+        for ts in pd.to_datetime(df["timestamp"])
+    ]
 
     print(f"\nRows loaded: {len(df)}")
     print(f"Columns    : {len(df.columns)}")
