@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { Environment, Grid, Html, OrbitControls } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
@@ -146,25 +146,29 @@ function ThermalPowerPlant({
         near: 0.1,
         far: 180,
       }}
-      dpr={[1, 1.5]}
+      dpr={[1, 1.25]}
       shadows
       gl={{ antialias: true, alpha: false }}
       onPointerMissed={() => onSelectionChange(null)}
     >
       <color attach="background" args={['#071018']} />
-      <ambientLight intensity={0.72} />
+      <ambientLight intensity={0.5} />
+      <hemisphereLight args={['#dce6ec', '#423b34', 0.48]} />
       <directionalLight
         position={[16, 24, 18]}
-        intensity={3.1}
+        intensity={3.3}
         castShadow
         shadow-mapSize={[2048, 2048]}
+        shadow-camera-near={0.5}
+        shadow-camera-far={90}
         shadow-camera-left={-24}
         shadow-camera-right={24}
         shadow-camera-top={26}
         shadow-camera-bottom={-24}
-        shadow-bias={-0.0003}
+        shadow-bias={-0.00015}
+        shadow-normalBias={0.02}
       />
-      <directionalLight position={[-16, 12, -10]} intensity={0.85} />
+      <directionalLight position={[-16, 12, -10]} intensity={0.72} />
       <Environment preset="studio" />
       <mesh position={[0, -0.265, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[58, 52]} />
@@ -190,4 +194,4 @@ function ThermalPowerPlant({
   )
 }
 
-export default ThermalPowerPlant
+export default memo(ThermalPowerPlant)
