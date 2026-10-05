@@ -218,13 +218,13 @@
   height: 3px;
   display: inline-block;
   border-radius: 3px;
-  box-shadow: 0 0 7px currentColor;
+  box-shadow: none;
 }
 
-.flow-swatch--steam { color: #c8533e; background: #c8533e; }
-.flow-swatch--feedwater { color: #b89358; background: #b89358; }
-.flow-swatch--cooling { color: #318bb3; background: #318bb3; }
-.flow-swatch--coal { color: #343a3c; background: #343a3c; }
+.flow-swatch--steam { color: var(--steam); background: var(--steam); }
+.flow-swatch--feedwater { color: var(--feedwater); background: var(--feedwater); }
+.flow-swatch--cooling { color: var(--cooling); background: var(--cooling); }
+.flow-swatch--coal { color: var(--coal); background: var(--coal); }
 
 .plant-sidebar {
   min-height: 0;
@@ -300,13 +300,13 @@
 }
 
 .overview-schematic span { position: absolute; display: block; }
-.schematic-stack { left: 13px; top: 7px; width: 5px; height: 24px; border-top: 5px solid #d8e5e9; background: linear-gradient(90deg, #a5bdc7, #607c8b); }
-.schematic-boiler { left: 23px; bottom: 9px; width: 19px; height: 24px; border: 2px solid #839da9; background: repeating-linear-gradient(0deg, #435c68 0 3px, #758a93 3px 5px); }
-.schematic-turbine { left: 45px; bottom: 10px; width: 17px; height: 10px; border: 2px solid #93aab3; border-radius: 4px; background: #526d7c; }
-.schematic-tower { right: 4px; bottom: 8px; width: 12px; height: 23px; border: 1px solid #b2c0c4; border-radius: 5px 5px 3px 3px; background: linear-gradient(90deg, #70848c, #b2bdc0, #657981); clip-path: polygon(0 0, 100% 0, 84% 100%, 16% 100%); }
-.schematic-pipe { height: 2px; border-radius: 3px; background: #e17748; }
+.schematic-stack { left: 13px; top: 7px; width: 5px; height: 24px; border-top: 5px solid #d8dfde; background: #7d8887; }
+.schematic-boiler { left: 23px; bottom: 9px; width: 19px; height: 24px; border: 2px solid #85908f; background: repeating-linear-gradient(0deg, #465051 0 3px, #687372 3px 5px); }
+.schematic-turbine { left: 45px; bottom: 10px; width: 17px; height: 10px; border: 2px solid #929d9c; border-radius: 4px; background: #555f60; }
+.schematic-tower { right: 4px; bottom: 8px; width: 12px; height: 23px; border: 1px solid #aeb8b6; border-radius: 5px 5px 3px 3px; background: #828d8b; clip-path: polygon(0 0, 100% 0, 84% 100%, 16% 100%); }
+.schematic-pipe { height: 2px; border-radius: 3px; background: var(--steam); }
 .schematic-pipe-a { left: 17px; top: 13px; width: 19px; transform: rotate(25deg); }
-.schematic-pipe-b { left: 39px; bottom: 13px; width: 18px; background: #51bde9; }
+.schematic-pipe-b { left: 39px; bottom: 13px; width: 18px; background: var(--cooling); }
 
 .overview-metric {
   min-height: 29px;
@@ -726,36 +726,43 @@
   .analytics-grid { grid-template-columns: 1fr; }
 }
 
-/* Partially dark SCADA theme: keep the model and compact overlays dark,
-   with light information panels and analytics for comfortable reading. */
+/* Industrial SCADA palette: restrained graphite surfaces with process colors. */
 .app {
-  --page: #edf2f6;
-  --panel: #ffffff;
-  --panel-raised: #f5f8fa;
-  --line: #d6e0e7;
-  --text: #243746;
-  --muted: #617786;
-  --cyan: #087eb4;
-  --green: #178356;
-  --amber: #a86a13;
+  --page: #202729;
+  --panel: #293133;
+  --panel-raised: #313a3c;
+  --line: #465153;
+  --text: #e4e9e8;
+  --muted: #a9b4b4;
+  --steam: #c8533e;
+  --feedwater: #b89358;
+  --cooling: #318bb3;
+  --coal: #899394;
+  --green: #68b88c;
+  --amber: #d0a45b;
   color: var(--text);
   background: var(--page);
 }
 
 .topbar {
-  border-bottom-color: #233c50;
-  color: #e7f0f5;
-  background: #0d2031;
-  box-shadow: 0 4px 15px rgba(17, 39, 55, 0.2);
+  border-bottom-color: #495456;
+  color: var(--text);
+  background: #292f31;
+  box-shadow: none;
 }
 
-.brand-mark { stroke: #e7f0f5; }
-.brand-divider { background: #405b70; }
-.brand-subtitle { color: #b9cbd6; }
+.nav-tab { color: #c4cdcc; }
+.nav-tab:hover,
+.nav-tab:focus-visible { border-color: #596668; background: #343c3e; }
+.nav-tab--active { border-color: var(--steam); color: #fff0ec; background: #593830; box-shadow: inset 0 -2px 0 var(--steam); }
+
+.brand-mark { stroke: #dce2e1; }
+.brand-divider { background: #535d5f; }
+.brand-subtitle { color: #b4bdbc; }
 
 .connection-group {
   gap: 11px;
-  color: #d1dee6;
+  color: #d2d9d8;
 }
 
 .connection-chip {
@@ -767,17 +774,17 @@
   white-space: nowrap;
 }
 
-.connection-chip > span { color: #a9bdc9; }
-.connection-chip strong { color: #e1ebf0; font-size: 8px; font-weight: 650; }
+.connection-chip > span { color: #aeb8b8; }
+.connection-chip strong { color: #e0e6e5; font-size: 8px; font-weight: 650; }
 .connection-name--short { display: none; }
 .connection-chip .connection-indicator { width: 7px; height: 7px; flex-basis: 7px; }
-.connection-chip .connection-indicator--online { background: #29b87c; box-shadow: 0 0 7px rgba(41, 184, 124, 0.38); }
-.connection-chip .connection-indicator--checking { background: #d49b3c; box-shadow: none; }
-.connection-chip .connection-indicator--offline { background: #8394a0; box-shadow: none; }
+.connection-chip .connection-indicator--online { background: var(--green); box-shadow: none; }
+.connection-chip .connection-indicator--checking { background: var(--amber); box-shadow: none; }
+.connection-chip .connection-indicator--offline { background: var(--coal); box-shadow: none; }
 
 .plant-screen {
-  border-bottom: 1px solid #7aa7c4;
-  background: #f0f4f7;
+  border-bottom: 1px solid #4a5557;
+  background: var(--page);
 }
 
 .plant-layout {
@@ -796,13 +803,20 @@
 .plant-stage {
   border-right: 0;
   border-radius: 0 0 5px 0;
-  background: #0a1822;
+  background: #252c2e;
+}
+
+.scene-legend {
+  border-color: #4a5557;
+  background: rgba(39, 47, 49, 0.94);
+  box-shadow: none;
+  color: #d5dddc;
 }
 
 .plant-sidebar {
   border-radius: 0 0 0 5px;
-  background: #e8eef2;
-  scrollbar-color: #9db1bf #e8eef2;
+  background: #232a2c;
+  scrollbar-color: #667274 #232a2c;
   transition: opacity 220ms ease, transform 320ms ease, visibility 0s linear 320ms;
 }
 
@@ -818,21 +832,21 @@
 }
 
 .rail-panel {
-  border-color: #d4dfe6;
+  border-color: var(--line);
   border-radius: 7px;
-  background: #fff;
-  box-shadow: 0 3px 12px rgba(31, 56, 73, 0.08);
+  background: var(--panel);
+  box-shadow: none;
 }
 
 .rail-panel-title {
   min-height: 40px;
-  border-bottom-color: #e0e8ed;
-  background: #f7fafb;
-  color: #233847;
+  border-bottom-color: var(--line);
+  background: var(--panel-raised);
+  color: var(--text);
 }
 
 .rail-panel-title h2 { font-size: 12px; }
-.panel-icon { color: #177da9; background: #e5f2f7; }
+.panel-icon { color: #8bbdcc; background: #344346; }
 .panel-icon--plant { width: 22px; height: 22px; }
 .panel-icon--plant svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -842,55 +856,55 @@
   margin-left: auto;
   display: inline-grid;
   place-items: center;
-  border: 1px solid #cbd9e1;
+  border: 1px solid #586365;
   border-radius: 5px;
-  color: #526e7f;
-  background: #fff;
+  color: #c4cecd;
+  background: #30383a;
   cursor: pointer;
   transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
 .panel-minimize:hover,
-.panel-minimize:focus-visible { border-color: #8ab7d0; color: #075f8c; background: #eef7fb; }
+.panel-minimize:focus-visible { border-color: var(--cooling); color: #d9eef2; background: #354548; }
 .panel-minimize svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
 
 .overview-banner {
   min-height: 77px;
-  border-bottom-color: #e1e9ee;
-  background: linear-gradient(115deg, #f1f7fa, #e8f1f5);
+  border-bottom-color: var(--line);
+  background: #2d3537;
 }
 
 .overview-schematic {
-  border-color: #cadae3;
-  background: linear-gradient(145deg, #e4eff4, #d5e4eb 70%);
+  border-color: #535e60;
+  background: #252d2f;
 }
 
-.overview-copy strong { color: #233b4b; font-size: 10px; letter-spacing: 0.3px; }
-.overview-copy small { color: #647d8c; font-size: 8px; }
-.overview-waiting { display: flex; align-items: center; gap: 5px; margin-top: 6px; color: #6a7f8a; font-size: 7px; font-weight: 650; letter-spacing: 0.35px; }
-.overview-waiting i { width: 6px; height: 6px; border-radius: 50%; background: #99a8b0; }
+.overview-copy strong { color: var(--text); font-size: 10px; letter-spacing: 0.3px; }
+.overview-copy small { color: #b5c0bf; font-size: 8px; }
+.overview-waiting { display: flex; align-items: center; gap: 5px; margin-top: 6px; color: #a3aeae; font-size: 7px; font-weight: 650; letter-spacing: 0.35px; }
+.overview-waiting i { width: 6px; height: 6px; border-radius: 50%; background: var(--coal); }
 
 .overview-metrics { padding: 3px 10px 1px; }
-.overview-metric { border-bottom-color: #e7edf1; color: #506777; font-size: 9px; }
-.overview-metric strong { color: #637987; font-size: 9px; }
-.overview-metric small { color: #82949e; }
-.metric-icon { color: #267da2; background: #e9f4f8; }
+.overview-metric { border-bottom-color: #414b4d; color: #c0c9c8; font-size: 9px; }
+.overview-metric strong { color: var(--text); font-size: 9px; }
+.overview-metric small { color: #aeb9b8; }
+.metric-icon { color: #9bc9d3; background: #354548; }
 
 .panel-footnote {
-  border-top-color: #e3ebef;
-  color: #6e828e;
+  border-top-color: #414b4d;
+  color: #a9b4b4;
 }
 
-.system-status-row { border-bottom-color: #e7edf1; color: #526a79; }
-.status-symbol { border-color: #cfe0e8; color: #287d9f; background: #eff7fa; }
-.status-badge { color: #617682; background: #edf1f3; }
-.status-badge--good { color: #16724c; background: #e5f4ed; }
-.status-badge--warning { color: #98600d; background: #fbf1df; }
-.status-badge--muted { color: #627682; background: #edf1f3; }
-.alerts-heading .rail-action { color: #667d8b; }
-.empty-alerts { color: #344b59; }
-.empty-alert-icon { color: #70828c; background: #edf1f3; }
-.empty-alerts small { color: #758894; }
+.system-status-row { border-bottom-color: #414b4d; color: #c0c9c8; }
+.status-symbol { border-color: #526164; color: #9bc9d3; background: #303a3c; }
+.status-badge { color: #bec7c6; background: #3a4446; }
+.status-badge--good { color: #8ed1a9; background: #30483b; }
+.status-badge--warning { color: #e4bf7d; background: #4c4030; }
+.status-badge--muted { color: #b0baba; background: #3a4446; }
+.alerts-heading .rail-action { color: #bac4c3; }
+.empty-alerts { color: #d7dddc; }
+.empty-alert-icon { color: #c3cdcc; background: #3a4446; }
+.empty-alerts small { color: #adb8b7; }
 
 .overview-restore {
   position: absolute;
@@ -902,33 +916,58 @@
   align-items: center;
   gap: 9px;
   padding: 6px 12px 6px 8px;
-  border: 1px solid #cad8df;
+  border: 1px solid #525e60;
   border-radius: 6px;
-  color: #294556;
-  background: rgba(250, 253, 254, 0.96);
-  box-shadow: 0 5px 18px rgba(2, 16, 24, 0.24);
+  color: #e0e6e5;
+  background: rgba(43, 51, 53, 0.97);
+  box-shadow: none;
   text-align: left;
   cursor: pointer;
   transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
 .overview-restore:hover,
-.overview-restore:focus-visible { border-color: #78a9c1; background: #fff; transform: translateY(-1px); }
+.overview-restore:focus-visible { border-color: var(--cooling); background: #353e40; transform: translateY(-1px); }
 .overview-restore > span:last-child { display: grid; gap: 3px; }
 .overview-restore strong { font-size: 8px; letter-spacing: 0.45px; }
-.overview-restore small { color: #718693; font-size: 8px; }
-.restore-icon { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 4px; color: #126e98; background: #e6f2f7; font-size: 20px; line-height: 1; }
+.overview-restore small { color: #b0bcbb; font-size: 8px; }
+.restore-icon { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 4px; color: #a7d2dc; background: #354548; font-size: 20px; line-height: 1; }
 
-.stage-heading h1 { color: #f0f6f8; }
-.stage-heading p { color: #b4c4cd; }
-.eyebrow { color: #688391; }
-.stage-heading .eyebrow { color: #a8c2cf; }
-.plant-controls { color: #b6c6ce; }
-.decision-support { color: #d8e4e9; }
+.stage-heading h1 { color: #f0f4f3; }
+.stage-heading p { color: #bdc8c7; }
+.eyebrow { color: #9eacab; }
+.stage-heading .eyebrow { color: #c4cecd; }
+.plant-controls { color: #b8c2c1; }
+.decision-support,
+.equipment-inspector {
+  border-color: #505d5f;
+  border-radius: 4px;
+  background: rgba(39, 47, 49, 0.97);
+  box-shadow: none;
+  backdrop-filter: blur(5px);
+  color: #d8dfde;
+}
 .decision-support .eyebrow,
-.equipment-inspector .eyebrow { color: #a8c2cf; }
+.equipment-inspector .eyebrow { color: #bdc9c8; }
 .decision-support .panel-footnote,
-.equipment-inspector .panel-footnote { color: #9aadb8; border-top-color: rgba(68, 91, 105, 0.72); }
+.equipment-inspector .panel-footnote { color: #aeb9b8; border-top-color: #475254; }
+.decision-state { color: #c2cbca; background: #3a4446; }
+.decision-state--ready { color: #9cdbb4; background: #30483b; }
+.decision-reading,
+.decision-level,
+.inspector-reading { border-top-color: #475254; color: #b7c1c0; }
+.decision-reading strong,
+.decision-level strong,
+.inspector-reading strong { color: #e0e6e5; }
+.decision-level { border-top-color: #566264; }
+.decision-level strong { color: #d1d9d8; }
+.inspector-heading { border-bottom-color: #505d5f; background: #313a3c; }
+.inspector-heading h2 { color: #e8edec; }
+.icon-button { border-color: #596668; color: #d3dcdb; background: #394345; }
+.icon-button:hover { color: #fff; background: #465355; }
+.inspector-reading strong small { color: #b4bfbe; }
+.value-warning { color: #e1b96f !important; }
+.equipment-inspector .panel-footnote { background: #2b3335; }
 
 .equipment-inspector {
   top: 85px;
@@ -937,50 +976,61 @@
   width: min(275px, calc(100% - 36px));
   max-height: calc(100% - 112px);
   overflow-y: auto;
-  border-color: rgba(145, 180, 197, 0.65);
-  border-radius: 7px;
-  background: rgba(12, 31, 44, 0.94);
-  scrollbar-color: #496577 #102638;
+  border-color: #596668;
+  border-radius: 4px;
+  background: rgba(39, 47, 49, 0.97);
+  scrollbar-color: #667274 #293133;
 }
 
-.inspector-heading h2 { color: #eff6f8; }
 .panel-minimize:focus-visible,
 .overview-restore:focus-visible,
 .nav-tab:focus-visible,
-.icon-button:focus-visible { outline: 2px solid #42a4cf; outline-offset: 2px; }
+.icon-button:focus-visible { outline: 2px solid var(--cooling); outline-offset: 2px; }
 
 .content-section {
-  border-bottom-color: #d8e2e8;
-  color: #283d4c;
-  background: #edf2f6;
+  border-bottom-color: #465153;
+  color: var(--text);
+  background: #252c2e;
 }
 
-.analytics-section { background: #e5edf2; }
-.section-heading h2 { color: #263c4b; }
-.content-section .eyebrow { color: #5e7d8e; }
+.analytics-section { background: #22292b; }
+.section-heading h2 { color: var(--text); }
+.content-section .eyebrow { color: #b2bebd; }
 .parameter-card,
 .analytics-card {
-  border-color: #d6e0e6;
-  border-radius: 7px;
-  background: #fff;
-  box-shadow: 0 3px 11px rgba(36, 61, 77, 0.06);
+  border-color: var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  box-shadow: none;
 }
 
-.parameter-label { color: #637987; }
-.parameter-card strong { color: #273e4e; }
-.parameter-card strong small { color: #718590; }
-.parameter-note { color: #84949d; }
-.chart-heading h3 { color: #314958; }
-.chart-heading span { color: #748894; }
-.chart-empty line { stroke: #e3eaee; }
-.chart-empty p { border-color: #dce6eb; color: #687f8d; background: rgba(250, 252, 253, 0.94); }
-.decision-empty { color: #3b5362; }
-.decision-empty p { color: #758894; }
+.parameter-label { color: #c1cbca; }
+.parameter-card strong { color: #f0f3f2; }
+.parameter-card strong small { color: #b2bdbc; }
+.parameter-note { color: #abb6b5; }
+.chart-heading h3 { color: #e2e8e7; }
+.chart-heading span { color: #bcc6c5; }
+.chart-empty line { stroke: #424d4f; }
+.chart-empty p { border-color: #505b5d; color: #bdc7c6; background: rgba(42, 50, 52, 0.96); }
+.decision-empty { color: #d8dfde; }
+.decision-empty p { color: #b1bcbb; }
+
+.overview-metric strong,
+.connection-chip strong,
+.decision-reading strong,
+.decision-level strong,
+.inspector-reading strong,
+.parameter-card strong,
+.chart-heading span,
+.status-badge {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Cascadia Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
 
 .app-footer {
-  border-top: 1px solid #20394c;
-  color: #b3c3cc;
-  background: #102536;
+  border-top: 1px solid #465153;
+  color: #bac4c3;
+  background: #292f31;
 }
 
 @media (max-width: 1380px) {

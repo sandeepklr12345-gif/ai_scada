@@ -33,11 +33,11 @@ function PlantLabels() {
           <div
             style={{
               padding: '4px 7px',
-              border: '1px solid rgba(195, 219, 228, 0.62)',
+              border: '1px solid rgba(168, 184, 183, 0.62)',
               borderRadius: 3,
               color: '#f0f4f4',
-              background: 'rgba(13, 24, 30, 0.86)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.28)',
+              background: 'rgba(39, 47, 49, 0.92)',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.24)',
               font: '600 9px/1.1 Inter, Arial, sans-serif',
               letterSpacing: '0.08em',
               whiteSpace: 'nowrap',
@@ -151,7 +151,7 @@ function ThermalPowerPlant({
       gl={{ antialias: true, alpha: false }}
       onPointerMissed={() => onSelectionChange(null)}
     >
-      <color attach="background" args={['#071018']} />
+      <color attach="background" args={['#252c2e']} />
       <ambientLight intensity={0.5} />
       <hemisphereLight args={['#dce6ec', '#423b34', 0.48]} />
       <directionalLight
