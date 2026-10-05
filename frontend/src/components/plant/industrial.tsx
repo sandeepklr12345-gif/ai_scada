@@ -33,6 +33,7 @@ export const metal = {
 
 export type BoxPlacement = { position: Vec3; size: Vec3; rotation?: Vec3 }
 export type CylinderPlacement = { position: Vec3; radius: number; length: number; rotation?: Vec3 }
+export type MemberPlacement = { from: Vec3; to: Vec3; width?: number; depth?: number }
 
 export function InstancedBoxes({
   placements,
@@ -60,7 +61,7 @@ export function InstancedBoxes({
 
   if (placements.length === 0) return null
   return (
-    <instancedMesh ref={instances} args={[undefined, undefined, placements.length]} material={material} castShadow receiveShadow frustumCulled={false}>
+    <instancedMesh ref={instances} args={[undefined, undefined, placements.length]} material={material} castShadow receiveShadow>
       <boxGeometry args={[1, 1, 1]} />
     </instancedMesh>
   )
@@ -94,7 +95,7 @@ export function InstancedCylinders({
 
   if (placements.length === 0) return null
   return (
-    <instancedMesh ref={instances} args={[undefined, undefined, placements.length]} material={material} castShadow receiveShadow frustumCulled={false}>
+    <instancedMesh ref={instances} args={[undefined, undefined, placements.length]} material={material} castShadow receiveShadow>
       <cylinderGeometry args={[1, 1, 1, radialSegments]} />
     </instancedMesh>
   )
@@ -215,6 +216,43 @@ export function Member({
     <mesh position={position} quaternion={quaternion} material={material} castShadow receiveShadow>
       <boxGeometry args={[width, length, depth]} />
     </mesh>
+  )
+}
+
+export function InstancedMembers({
+  placements,
+  material = metal.frame,
+}: {
+  placements: MemberPlacement[]
+  material?: THREE.Material
+}) {
+  const instances = useRef<THREE.InstancedMesh>(null)
+  const transform = useMemo(() => new THREE.Object3D(), [])
+  const up = useMemo(() => new THREE.Vector3(0, 1, 0), [])
+
+  useLayoutEffect(() => {
+    const mesh = instances.current
+    if (!mesh) return
+    placements.forEach(({ from, to, width = 0.14, depth = width }, index) => {
+      const start = new THREE.Vector3(...from)
+      const end = new THREE.Vector3(...to)
+      const direction = end.clone().sub(start)
+      const length = direction.length()
+      transform.position.copy(start).add(end).multiplyScalar(0.5)
+      transform.quaternion.setFromUnitVectors(up, direction.normalize())
+      transform.scale.set(width, length, depth)
+      transform.updateMatrix()
+      mesh.setMatrixAt(index, transform.matrix)
+    })
+    mesh.instanceMatrix.needsUpdate = true
+    mesh.computeBoundingSphere()
+  }, [placements, transform, up])
+
+  if (placements.length === 0) return null
+  return (
+    <instancedMesh ref={instances} args={[undefined, undefined, placements.length]} material={material} castShadow receiveShadow>
+      <boxGeometry args={[1, 1, 1]} />
+    </instancedMesh>
   )
 }
 

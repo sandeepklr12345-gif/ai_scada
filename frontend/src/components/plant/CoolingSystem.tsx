@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
-import { Box, Cylinder, Foundation, InstancedBoxes, Member, SelectionBounds, metal } from './industrial'
-import type { BoxPlacement } from './industrial'
+import { Box, Cylinder, Foundation, InstancedBoxes, InstancedCylinders, InstancedMembers, SelectionBounds, metal } from './industrial'
+import type { BoxPlacement, CylinderPlacement, MemberPlacement, Vec3 } from './industrial'
 import { RisingVapor, RotatingPumpCoupling, VISUAL_ONLY_DRIVE } from './motion'
 
 const towerProfile: [number, number][] = [
@@ -16,6 +16,48 @@ const towerProfile: [number, number][] = [
   [2.98, 13.6],
   [3.13, 14.35],
 ]
+
+const towerRibSegments: CylinderPlacement[] = Array.from({ length: 28 }, (_, index) => {
+  const angle = (index / 28) * Math.PI * 2
+  return towerProfile.slice(1).map(([,], segment) => {
+    const [startRadius, startY] = towerProfile[segment]
+    const [endRadius, endY] = towerProfile[segment + 1]
+    const start = new THREE.Vector3(Math.cos(angle) * (startRadius + 0.025), startY, Math.sin(angle) * (startRadius + 0.025))
+    const end = new THREE.Vector3(Math.cos(angle) * (endRadius + 0.025), endY, Math.sin(angle) * (endRadius + 0.025))
+    const direction = end.clone().sub(start)
+    const rotation = new THREE.Euler().setFromQuaternion(
+      new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize()),
+    )
+    return {
+      position: [
+        (start.x + end.x) / 2,
+        (start.y + end.y) / 2,
+        (start.z + end.z) / 2,
+      ] as Vec3,
+      radius: 0.035,
+      length: direction.length(),
+      rotation: [rotation.x, rotation.y, rotation.z] as Vec3,
+    }
+  })
+}).flat()
+
+const towerFrame: MemberPlacement[] = Array.from({ length: 20 }, (_, index) => {
+  const angle = (index / 20) * Math.PI * 2
+  return [
+    {
+      from: [Math.cos(angle) * 4.48, 0.6, Math.sin(angle) * 4.48] as Vec3,
+      to: [Math.cos(angle) * 3.55, 4.8, Math.sin(angle) * 3.55] as Vec3,
+      width: 0.1,
+      depth: 0.1,
+    },
+    {
+      from: [Math.cos(angle) * 4.45, 1.3, Math.sin(angle) * 4.45] as Vec3,
+      to: [Math.cos(angle + Math.PI / 10) * 4.05, 3.1, Math.sin(angle + Math.PI / 10) * 4.05] as Vec3,
+      width: 0.065,
+      depth: 0.065,
+    },
+  ]
+}).flat()
 
 function towerRadiusAt(y: number) {
   const upper = towerProfile.findIndex((point) => point[1] >= y)
@@ -70,45 +112,8 @@ function CoolingTower() {
         <torusGeometry args={[2.78, 0.065, 7, 52]} />
       </mesh>
       <InstancedBoxes placements={radialRoofBeams} material={metal.frameDark} />
-      {Array.from({ length: 28 }, (_, i) => {
-        const angle = (i / 28) * Math.PI * 2
-        const path = towerProfile.map(([radius, y]) => [
-          Math.cos(angle) * (radius + 0.025),
-          y,
-          Math.sin(angle) * (radius + 0.025),
-        ] as [number, number, number])
-        return (
-          <mesh key={i} material={metal.casingLight}>
-            <tubeGeometry args={[new THREE.CatmullRomCurve3(path.map((point) => new THREE.Vector3(...point))), 32, 0.035, 6, false]} />
-          </mesh>
-        )
-      })}
-      {Array.from({ length: 20 }, (_, i) => {
-        const angle = (i / 20) * Math.PI * 2
-        return (
-          <Member
-            key={i}
-            from={[Math.cos(angle) * 4.48, 0.6, Math.sin(angle) * 4.48]}
-            to={[Math.cos(angle) * 3.55, 4.8, Math.sin(angle) * 3.55]}
-            width={0.1}
-            depth={0.1}
-            material={metal.frameDark}
-          />
-        )
-      })}
-      {Array.from({ length: 20 }, (_, i) => {
-        const angle = (i / 20) * Math.PI * 2
-        return (
-          <Member
-            key={`cross-${i}`}
-            from={[Math.cos(angle) * 4.45, 1.3, Math.sin(angle) * 4.45]}
-            to={[Math.cos(angle + Math.PI / 10) * 4.05, 3.1, Math.sin(angle + Math.PI / 10) * 4.05]}
-            width={0.065}
-            depth={0.065}
-            material={metal.frameDark}
-          />
-        )
-      })}
+      <InstancedCylinders placements={towerRibSegments} material={metal.casingLight} radialSegments={6} />
+      <InstancedMembers placements={towerFrame} material={metal.frameDark} />
       {[-1, 1].map((side) => (
         <group key={side} position={[side * 3.3, 2.2, 3.7]}>
           <Box position={[0, 0, 0]} size={[1.5, 3.2, 0.12]} material={metal.frameDark} />
