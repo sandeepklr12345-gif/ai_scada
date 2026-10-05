@@ -1,4 +1,4 @@
-import { Box, Member, Pipe, SelectionBounds, metal } from './industrial'
+import { BoltedFlange, Box, Member, Pipe, SelectionBounds, metal } from './industrial'
 import type { Vec3 } from './industrial'
 import { FlowingParticles, VISUAL_ONLY_DRIVE } from './motion'
 
@@ -90,6 +90,8 @@ export default function ProcessPipes({
           material={metal.steam}
           segments={54}
         />
+        <BoltedFlange position={[0.42, 10.35, 2.4]} radius={0.32} axis="y" thickness={0.14} />
+        <BoltedFlange position={[2.45, 3.84, 1.45]} radius={0.31} axis="x" thickness={0.14} />
         <FlowingParticles points={MAIN_STEAM_ROUTE} color="#ffd2a4" count={9} radius={0.052} speed={0.12} drive={VISUAL_ONLY_DRIVE.steamFlow} offset={[0, 0.13, 0.3]} />
         <Box position={[0.42, 13.45, 2.4]} size={[0.6, 0.66, 0.66]} material={metal.frameDark} />
         <Member from={[0.42, 0.2, 3.05]} to={[0.42, 13.3, 3.05]} width={0.12} material={metal.frameDark} />
@@ -109,9 +111,10 @@ export default function ProcessPipes({
         <Pipe
           points={TURBINE_EXHAUST_ROUTE}
           radius={0.31}
-          material={metal.casingDark}
+          material={metal.steam}
           segments={28}
         />
+        <BoltedFlange position={[7.72, 2.26, 2.62]} radius={0.37} axis="x" thickness={0.15} />
         <FlowingParticles points={TURBINE_EXHAUST_ROUTE} color="#d9dfe0" count={7} radius={0.055} speed={0.09} drive={VISUAL_ONLY_DRIVE.steamFlow} offset={[0, 0.22, 0.18]} />
         <Member from={[9.1, 0.45, 0.85]} to={[9.1, 2.54, 1.35]} width={0.11} material={metal.frameDark} />
       </group>
@@ -121,6 +124,7 @@ export default function ProcessPipes({
           radius={0.17}
           material={metal.feedwater}
         />
+        <BoltedFlange position={[1.48, 0.96, 8.2]} radius={0.23} axis="x" thickness={0.12} />
         <FlowingParticles points={CONDENSER_TO_PUMPS_ROUTE} color="#8ddcff" count={7} radius={0.05} speed={0.1} drive={VISUAL_ONLY_DRIVE.feedwaterFlow} offset={[0, 0.18, 0.1]} />
         {[-2.6, -0.45, 1.7].map((x) => (
           <Pipe
@@ -150,6 +154,8 @@ export default function ProcessPipes({
           material={metal.feedwater}
           segments={44}
         />
+        <BoltedFlange position={[0.65, 2.55, 8.55]} radius={0.25} axis="x" thickness={0.12} />
+        <BoltedFlange position={[-3.2, 9.15, 2.82]} radius={0.25} axis="y" thickness={0.12} />
         <FlowingParticles points={FEEDWATER_RETURN_ROUTE} color="#c9e7ef" count={10} radius={0.052} speed={0.095} drive={VISUAL_ONLY_DRIVE.feedwaterFlow} offset={[0, 0.18, 0.12]} />
         {feedwaterSupports.map((position, i) => (
           <group key={i}>
@@ -159,6 +165,9 @@ export default function ProcessPipes({
         ))}
       </group>
       <group name="CoolingWaterCircuit">
+        <BoltedFlange position={[10.15, 0.72, -4.85]} radius={0.31} axis="x" thickness={0.14} />
+        <BoltedFlange position={[8.15, 1.08, 6.3]} radius={0.31} axis="x" thickness={0.14} />
+        <BoltedFlange position={[16.7, 0.95, 0.8]} radius={0.31} axis="z" thickness={0.14} />
         <Pipe
           points={[
             [10.5, 0.72, -5.05],
