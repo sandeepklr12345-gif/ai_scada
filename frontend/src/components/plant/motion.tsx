@@ -327,6 +327,72 @@ export function BurnerFlames({ drive = 0.55 }: { drive?: number }) {
   )
 }
 
+export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
+  const fireMaterials = useRef<Array<THREE.MeshStandardMaterial | null>>([])
+  const coreMaterials = useRef<Array<THREE.MeshStandardMaterial | null>>([])
+  const lights = useRef<Array<THREE.PointLight | null>>([])
+
+  useFrame(({ clock }) => {
+    const time = clock.elapsedTime * (0.9 + drive * 0.22)
+    for (let index = 0; index < 3; index += 1) {
+      const flicker =
+        Math.sin(time * 5.1 + index * 1.7) * 0.5 +
+        Math.sin(time * 8.3 + index * 2.4) * 0.32 +
+        Math.sin(time * 12.7 + index * 0.8) * 0.18
+      if (fireMaterials.current[index]) {
+        fireMaterials.current[index]!.emissiveIntensity = 1.65 + drive * 0.55 + flicker * 0.28
+      }
+      if (coreMaterials.current[index]) {
+        coreMaterials.current[index]!.emissiveIntensity = 1.3 + drive * 0.35 + flicker * 0.22
+      }
+      if (lights.current[index]) {
+        lights.current[index]!.intensity = 1.45 + drive * 0.62 + flicker * 0.27
+      }
+    }
+  })
+
+  return (
+    <group name="VisualOnlyFireboxGlow">
+      {[-1.12, 0, 1.12].map((x, index) => (
+        <group key={x} position={[x, 5.1, 2.69]}>
+          <mesh position={[0, 0, 0.005]}>
+            <planeGeometry args={[0.56, 0.9]} />
+            <meshStandardMaterial
+              ref={(material) => { fireMaterials.current[index] = material }}
+              color="#76250d"
+              emissive="#ff4a0a"
+              emissiveIntensity={1.8}
+              roughness={0.92}
+              metalness={0}
+              toneMapped={false}
+            />
+          </mesh>
+          <mesh position={[0, -0.02, 0.012]}>
+            <planeGeometry args={[0.13, 0.72]} />
+            <meshStandardMaterial
+              ref={(material) => { coreMaterials.current[index] = material }}
+              color="#d96b13"
+              emissive="#ffb526"
+              emissiveIntensity={1.5}
+              roughness={0.9}
+              metalness={0}
+              toneMapped={false}
+            />
+          </mesh>
+          <pointLight
+            ref={(light) => { lights.current[index] = light }}
+            position={[0, 0, 0.12]}
+            color="#ff7a2d"
+            intensity={1.8}
+            distance={4.1}
+            decay={2}
+          />
+        </group>
+      ))}
+    </group>
+  )
+}
+
 export function RotatingPumpCoupling({ drive = 0.48 }: { drive?: number }) {
   const rotor = useRef<THREE.Group>(null)
   useFrame((_, delta) => {

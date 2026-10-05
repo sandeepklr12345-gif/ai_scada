@@ -1,6 +1,6 @@
 import { BoltedFlange, Box, Cylinder, Foundation, InstancedBoxes, InstancedCylinders, Member, SelectionBounds, metal } from './industrial'
 import type { BoxPlacement, CylinderPlacement } from './industrial'
-import { BurnerFlames, VISUAL_ONLY_DRIVE } from './motion'
+import { FireboxGlow, VISUAL_ONLY_DRIVE } from './motion'
 
 const levels = [0.65, 3.65, 6.65, 9.65, 12.65, 15.65]
 const frameCorners = [-4.85, 4.85] as const
@@ -49,11 +49,28 @@ for (const x of [-3.18, 3.18]) {
 }
 
 const burnerNozzleCollars: CylinderPlacement[] = [-1.12, 0, 1.12].map((x) => ({
-  position: [x, 5.1, 3.015], radius: 0.275, length: 0.13, rotation: [Math.PI / 2, 0, 0],
+  position: [x, 4.18, 3.015], radius: 0.275, length: 0.13, rotation: [Math.PI / 2, 0, 0],
 }))
 const burnerNozzles: CylinderPlacement[] = [-1.12, 0, 1.12].map((x) => ({
-  position: [x, 5.1, 3.2], radius: 0.145, length: 0.28, rotation: [Math.PI / 2, 0, 0],
+  position: [x, 4.18, 3.2], radius: 0.145, length: 0.28, rotation: [Math.PI / 2, 0, 0],
 }))
+
+const burnerDoorFrames: BoxPlacement[] = []
+const burnerGrating: BoxPlacement[] = []
+for (const x of [-1.12, 0, 1.12]) {
+  burnerDoorFrames.push(
+    { position: [x - 0.34, 5.1, 2.81], size: [0.14, 1, 0.1] },
+    { position: [x + 0.34, 5.1, 2.81], size: [0.14, 1, 0.1] },
+    { position: [x, 4.58, 2.81], size: [0.82, 0.16, 0.1] },
+    { position: [x, 5.62, 2.81], size: [0.82, 0.16, 0.1] },
+  )
+  for (const offset of [-0.27, -0.09, 0.09, 0.27]) {
+    burnerGrating.push({ position: [x, 5.1 + offset, 2.82], size: [0.56, 0.025, 0.035] })
+  }
+  for (const offset of [-0.18, 0.18]) {
+    burnerGrating.push({ position: [x + offset, 5.1, 2.82], size: [0.025, 0.82, 0.035] })
+  }
+}
 
 const sideGuardRails: BoxPlacement[] = []
 for (const y of [2.5, 5.5, 8.5, 11.5, 14.5]) {
@@ -155,17 +172,26 @@ function BoilerFurnace() {
       <InstancedCylinders placements={boilerDowncomers} material={metal.casingDark} radialSegments={12} />
       <InstancedCylinders placements={waterwallHeaders} material={metal.casing} radialSegments={12} />
 
-      <Box position={[0, 4.75, 2.7]} size={[3.3, 4.8, 0.18]} material={metal.casingDark} />
-      <BurnerFlames drive={VISUAL_ONLY_DRIVE.boilerLoad} />
+      <Box position={[0, 3.45, 2.7]} size={[3.3, 2.2, 0.18]} material={metal.casingDark} />
+      <Box position={[0, 6.35, 2.7]} size={[3.3, 1.6, 0.18]} material={metal.casingDark} />
+      {[-1.535, -0.56, 0.56, 1.535].map((x, index) => (
+        <Box
+          key={`firebox-divider-${index}`}
+          position={[x, 5.1, 2.7]}
+          size={[index === 0 || index === 3 ? 0.23 : 0.52, 1, 0.18]}
+          material={metal.casingDark}
+        />
+      ))}
+      {[-1.12, 0, 1.12].map((x) => (
+        <Box key={`firebox-recess-${x}`} position={[x, 5.1, 2.67]} size={[0.6, 1, 0.04]} material={metal.furnace} />
+      ))}
+      <FireboxGlow drive={VISUAL_ONLY_DRIVE.boilerLoad} />
+      <InstancedBoxes placements={burnerDoorFrames} material={metal.furnaceDoor} />
+      <InstancedBoxes placements={burnerGrating} material={metal.frameDark} />
       <InstancedCylinders placements={burnerNozzleCollars} material={metal.furnaceDoor} radialSegments={16} />
       <InstancedCylinders placements={burnerNozzles} material={metal.casingDark} radialSegments={16} />
       {[-1.12, 0, 1.12].map((x) => (
-        <group key={x}>
-          <Box position={[x, 5.1, 2.82]} size={[0.82, 1.2, 0.08]} material={metal.furnaceDoor} />
-          <Box position={[x, 5.1, 2.89]} size={[0.58, 0.85, 0.04]} material={metal.casingDark} />
-          <Cylinder position={[x, 5.1, 2.94]} radius={0.21} length={0.05} material={metal.furnaceDoor} rotation={[Math.PI / 2, 0, 0]} radialSegments={12} />
-          <Box position={[x, 7.4, 2.83]} size={[0.72, 0.2, 0.1]} material={metal.frame} />
-        </group>
+        <Box key={`boiler-upper-burner-rail-${x}`} position={[x, 7.4, 2.83]} size={[0.72, 0.2, 0.1]} material={metal.frame} />
       ))}
       <InstancedCylinders placements={tubeBankBright} material={metal.casingLight} radialSegments={10} />
       <InstancedCylinders placements={tubeBankMain} material={metal.casing} radialSegments={10} />
