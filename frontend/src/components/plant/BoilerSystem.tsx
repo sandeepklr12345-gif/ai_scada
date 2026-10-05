@@ -16,6 +16,45 @@ const superheaterHeaders: CylinderPlacement[] = [-2.35, -1.55, -0.75, 0.05, 0.85
   position: [x, 10.6, 2.38], radius: 0.06, length: 3.8, rotation: [Math.PI / 2, 0, 0],
 }))
 
+// Keep the pressure-wall details in a few instance batches so the boiler can
+// show its tube construction without adding dozens of individual draw calls.
+const waterwallTubes: CylinderPlacement[] = []
+for (const x of [-2.85, -2.48, -2.11, -1.78, 1.78, 2.11, 2.48, 2.85]) {
+  waterwallTubes.push({ position: [x, 5.2, 2.72], radius: 0.045, length: 8.35 })
+}
+for (const side of [-1, 1]) {
+  for (let index = 0; index < 15; index += 1) {
+    const z = -2.45 + index * 0.35
+    waterwallTubes.push({ position: [side * 3.075, 5.2, z], radius: 0.045, length: 8.35 })
+  }
+}
+
+const boilerDowncomers: CylinderPlacement[] = []
+for (const x of [-3.2, 3.2]) {
+  for (const z of [-2.25, 2.25]) {
+    boilerDowncomers.push({ position: [x, 5.2, z], radius: 0.105, length: 9.05 })
+  }
+}
+
+const waterwallHeaders: CylinderPlacement[] = []
+for (const z of [-2.86, 2.86]) {
+  for (const y of [1.0, 9.35]) {
+    waterwallHeaders.push({ position: [0, y, z], radius: 0.14, length: 6.15, rotation: [0, 0, Math.PI / 2] })
+  }
+}
+for (const x of [-3.18, 3.18]) {
+  for (const y of [1.0, 9.35]) {
+    waterwallHeaders.push({ position: [x, y, 0], radius: 0.14, length: 5.2, rotation: [Math.PI / 2, 0, 0] })
+  }
+}
+
+const burnerNozzleCollars: CylinderPlacement[] = [-1.12, 0, 1.12].map((x) => ({
+  position: [x, 5.1, 3.015], radius: 0.275, length: 0.13, rotation: [Math.PI / 2, 0, 0],
+}))
+const burnerNozzles: CylinderPlacement[] = [-1.12, 0, 1.12].map((x) => ({
+  position: [x, 5.1, 3.2], radius: 0.145, length: 0.28, rotation: [Math.PI / 2, 0, 0],
+}))
+
 const sideGuardRails: BoxPlacement[] = []
 for (const y of [2.5, 5.5, 8.5, 11.5, 14.5]) {
   for (const x of [-4.56, 4.56]) {
@@ -112,8 +151,14 @@ function BoilerFurnace() {
       <Box position={[0, 12.95, 0]} size={[5.1, 1.2, 5]} material={metal.casing} castShadow receiveShadow />
       <Box position={[0, 13.65, 0]} size={[5.65, 0.2, 5.5]} material={metal.frameDark} castShadow receiveShadow />
 
+      <InstancedCylinders placements={waterwallTubes} material={metal.casingLight} radialSegments={8} />
+      <InstancedCylinders placements={boilerDowncomers} material={metal.casingDark} radialSegments={12} />
+      <InstancedCylinders placements={waterwallHeaders} material={metal.casing} radialSegments={12} />
+
       <Box position={[0, 4.75, 2.7]} size={[3.3, 4.8, 0.18]} material={metal.casingDark} />
       <BurnerFlames drive={VISUAL_ONLY_DRIVE.boilerLoad} />
+      <InstancedCylinders placements={burnerNozzleCollars} material={metal.furnaceDoor} radialSegments={16} />
+      <InstancedCylinders placements={burnerNozzles} material={metal.casingDark} radialSegments={16} />
       {[-1.12, 0, 1.12].map((x) => (
         <group key={x}>
           <Box position={[x, 5.1, 2.82]} size={[0.82, 1.2, 0.08]} material={metal.furnaceDoor} />
@@ -127,6 +172,12 @@ function BoilerFurnace() {
       <InstancedCylinders placements={superheaterHeaders} material={metal.casingLight} radialSegments={10} />
       <Cylinder position={[0, 14.45, 0]} radius={0.82} length={7.1} material={metal.casingDark} rotation={[0, 0, Math.PI / 2]} />
       <Cylinder position={[0, 14.45, 0]} radius={0.7} length={7.45} material={metal.casing} rotation={[0, 0, Math.PI / 2]} />
+      {[-3.68, 3.68].map((x) => (
+        <BoltedFlange key={`steam-drum-flange-${x}`} position={[x, 14.45, 0]} radius={0.84} axis="x" thickness={0.14} />
+      ))}
+      {[-2.2, 2.2].map((x) => (
+        <Box key={`steam-drum-saddle-${x}`} position={[x, 13.92, 0]} size={[0.42, 0.42, 1.55]} material={metal.frameDark} />
+      ))}
       {[-2.45, 2.45].map((x) => (
         <group key={`roof-vessel-${x}`}>
           <Cylinder position={[x, 15.12, -1.75]} radius={0.28} length={2.2} material={metal.casingDark} rotation={[0, 0, Math.PI / 2]} radialSegments={24} />
