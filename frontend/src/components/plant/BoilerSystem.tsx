@@ -46,7 +46,7 @@ function BoilerFrame() {
                 to={[x + 0.27, y, z]}
                 width={0.15}
                 depth={0.24}
-                material={metal.frameDark}
+                material={metal.boilerFrameDark}
               />
             ))}
           </group>
@@ -69,7 +69,7 @@ function BoilerFrame() {
             from={[-4.7, bottom, z]}
             to={[4.7, bottom + 3, z]}
             width={0.11}
-            material={metal.frameDark}
+            material={metal.boilerFrameDark}
           />
         )),
       )}
@@ -80,7 +80,7 @@ function BoilerFrame() {
             from={[x, bottom, -3.4]}
             to={[x, bottom + 3, 3.4]}
             width={0.11}
-            material={metal.frameDark}
+            material={metal.boilerFrameDark}
           />
         )),
       )}

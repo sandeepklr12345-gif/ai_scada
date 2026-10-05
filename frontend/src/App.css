@@ -221,10 +221,10 @@
   box-shadow: 0 0 7px currentColor;
 }
 
-.flow-swatch--steam { color: #e47747; background: #e47747; }
-.flow-swatch--feedwater { color: #c9b17c; background: #c9b17c; }
-.flow-swatch--cooling { color: #3caee5; background: #3caee5; }
-.flow-swatch--coal { color: #68747a; background: #68747a; }
+.flow-swatch--steam { color: #c8533e; background: #c8533e; }
+.flow-swatch--feedwater { color: #b89358; background: #b89358; }
+.flow-swatch--cooling { color: #318bb3; background: #318bb3; }
+.flow-swatch--coal { color: #343a3c; background: #343a3c; }
 
 .plant-sidebar {
   min-height: 0;
