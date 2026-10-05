@@ -114,10 +114,10 @@ function ThermalPowerPlant({
       onPointerMissed={() => onSelectionChange(null)}
     >
       <color attach="background" args={['#071018']} />
-      <ambientLight intensity={1.35} />
+      <ambientLight intensity={0.72} />
       <directionalLight
         position={[16, 24, 18]}
-        intensity={2.7}
+        intensity={3.1}
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-24}
@@ -126,8 +126,12 @@ function ThermalPowerPlant({
         shadow-camera-bottom={-24}
         shadow-bias={-0.0003}
       />
-      <directionalLight position={[-16, 12, -10]} intensity={1.05} />
-      <Environment preset="city" />
+      <directionalLight position={[-16, 12, -10]} intensity={0.85} />
+      <Environment preset="studio" />
+      <mesh position={[0, -0.265, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[58, 52]} />
+        <shadowMaterial transparent opacity={0.28} />
+      </mesh>
       <Grid
         args={[46, 42]}
         position={[0, 0.14, 0]}

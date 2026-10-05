@@ -70,6 +70,7 @@ function TurbineStageShell({
       geometry={geometry}
       material={material}
       castShadow
+      receiveShadow
     />
   )
 }

@@ -92,7 +92,7 @@ export function InstancedCylinders({
 
   if (placements.length === 0) return null
   return (
-    <instancedMesh ref={instances} args={[undefined, undefined, placements.length]} material={material} castShadow frustumCulled={false}>
+    <instancedMesh ref={instances} args={[undefined, undefined, placements.length]} material={material} castShadow receiveShadow frustumCulled={false}>
       <cylinderGeometry args={[1, 1, 1, radialSegments]} />
     </instancedMesh>
   )
@@ -176,7 +176,7 @@ export function Cylinder({
   radialSegments?: number
 }) {
   return (
-    <mesh position={position} rotation={rotation} material={material} castShadow>
+    <mesh position={position} rotation={rotation} material={material} castShadow receiveShadow>
       <cylinderGeometry args={[radius, radius, length, radialSegments]} />
     </mesh>
   )
@@ -210,7 +210,7 @@ export function Member({
   }, [from, to])
 
   return (
-    <mesh position={position} quaternion={quaternion} material={material}>
+    <mesh position={position} quaternion={quaternion} material={material} castShadow receiveShadow>
       <boxGeometry args={[width, length, depth]} />
     </mesh>
   )
@@ -238,7 +238,7 @@ export function Pipe({
   )
 
   return (
-    <mesh material={material} castShadow>
+    <mesh material={material} castShadow receiveShadow>
       <tubeGeometry args={[curve, segments, radius, 10, false]} />
     </mesh>
   )

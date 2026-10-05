@@ -40,7 +40,7 @@ function CoalHopper({ position, index }: { position: Vec3; index: number }) {
   return (
     <group position={position} name={`CoalHopper-${index}`}>
       <Foundation position={[0, -1.55, 0]} size={[3, 0.4, 2.8]} />
-      <mesh position={[0, 0, 0]} geometry={hopperFunnel} material={metal.casing} castShadow />
+      <mesh position={[0, 0, 0]} geometry={hopperFunnel} material={metal.casing} castShadow receiveShadow />
       <Box position={[0, 1.34, 0]} size={[2.66, 0.18, 2.46]} material={metal.frameDark} />
       <Box position={[0, 1.24, 0]} size={[2.28, 0.22, 2.08]} material={metal.coal} />
       <Box position={[0, 0.04, 0]} size={[0.66, 0.38, 0.6]} material={metal.frameDark} />

@@ -108,9 +108,9 @@ function BoilerFurnace() {
     <group name="BoilerFurnace">
       <Foundation position={[0, 0.05, 0]} size={[10.5, 0.75, 8.2]} />
       <Box position={[0, 5.2, 0]} size={[6.1, 9.1, 5.3]} material={metal.furnace} castShadow receiveShadow />
-      <Box position={[0, 10.6, 0]} size={[4.65, 2.5, 4.6]} material={metal.casingDark} />
-      <Box position={[0, 12.95, 0]} size={[5.1, 1.2, 5]} material={metal.casing} />
-      <Box position={[0, 13.65, 0]} size={[5.65, 0.2, 5.5]} material={metal.frameDark} />
+      <Box position={[0, 10.6, 0]} size={[4.65, 2.5, 4.6]} material={metal.casingDark} castShadow receiveShadow />
+      <Box position={[0, 12.95, 0]} size={[5.1, 1.2, 5]} material={metal.casing} castShadow receiveShadow />
+      <Box position={[0, 13.65, 0]} size={[5.65, 0.2, 5.5]} material={metal.frameDark} castShadow receiveShadow />
 
       <Box position={[0, 4.75, 2.7]} size={[3.3, 4.8, 0.18]} material={metal.casingDark} />
       <BurnerFlames drive={VISUAL_ONLY_DRIVE.boilerLoad} />
