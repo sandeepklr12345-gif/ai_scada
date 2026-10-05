@@ -17,6 +17,59 @@ const towerProfile: [number, number][] = [
   [3.13, 14.35],
 ]
 
+function createTowerWeatheringTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 192
+  canvas.height = 256
+  const context = canvas.getContext('2d')
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.wrapS = THREE.RepeatWrapping
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  if (!context) return texture
+
+  let seed = 2851
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0
+    return seed / 4294967296
+  }
+
+  const base = context.createLinearGradient(0, 0, 0, canvas.height)
+  base.addColorStop(0, '#f0eee7')
+  base.addColorStop(0.72, '#e7e5dc')
+  base.addColorStop(0.88, '#d9d7ce')
+  base.addColorStop(1, '#d0cec5')
+  context.fillStyle = base
+  context.fillRect(0, 0, canvas.width, canvas.height)
+
+  for (let index = 0; index < 44; index += 1) {
+    const x = random() * canvas.width
+    const startY = random() * canvas.height * 0.72
+    const endY = Math.min(canvas.height, startY + 18 + random() * 92)
+    context.beginPath()
+    context.moveTo(x, startY)
+    context.lineTo(x + (random() - 0.5) * 3, endY)
+    context.strokeStyle = index % 4 === 0 ? 'rgba(49,54,52,0.15)' : 'rgba(71,74,70,0.075)'
+    context.lineWidth = 0.5 + random() * 1.5
+    context.stroke()
+  }
+
+  for (const y of [0.16, 0.38, 0.58, 0.82, 0.9]) {
+    context.fillStyle = `rgba(48,53,51,${y > 0.8 ? 0.1 : 0.045})`
+    context.fillRect(0, canvas.height * y, canvas.width, 1 + (y > 0.8 ? 1 : 0))
+  }
+
+  for (let index = 0; index < 900; index += 1) {
+    const shade = random() > 0.5 ? 40 : 235
+    context.fillStyle = `rgba(${shade},${shade},${shade},${0.025 + random() * 0.04})`
+    context.fillRect(random() * canvas.width, random() * canvas.height, 1, 1)
+  }
+
+  texture.needsUpdate = true
+  return texture
+}
+
 const towerRibSegments: CylinderPlacement[] = Array.from({ length: 28 }, (_, index) => {
   const angle = (index / 28) * Math.PI * 2
   return towerProfile.slice(1).map(([,], segment) => {
@@ -69,6 +122,15 @@ function towerRadiusAt(y: number) {
 }
 
 function CoolingTower() {
+  const weatheredConcrete = useMemo(
+    () => new THREE.MeshStandardMaterial({
+      color: '#85867f',
+      map: createTowerWeatheringTexture(),
+      metalness: 0.02,
+      roughness: 0.97,
+    }),
+    [],
+  )
   const geometry = useMemo(
     () =>
       new THREE.LatheGeometry(
@@ -94,9 +156,9 @@ function CoolingTower() {
   return (
     <group name="CoolingTower" position={[11.2, 0, -9.5]}>
       <Foundation position={[0, 0.1, 0]} size={[10.5, 0.35, 10.5]} />
-      <mesh geometry={geometry} material={metal.tower} castShadow receiveShadow />
-      <mesh geometry={innerGeometry} material={metal.casingLight} />
-      <mesh position={[0, 14.35, 0]} rotation={[Math.PI / 2, 0, 0]} material={metal.casingLight}>
+      <mesh geometry={geometry} material={weatheredConcrete} castShadow receiveShadow />
+      <mesh geometry={innerGeometry} material={metal.casingDark} />
+      <mesh position={[0, 14.35, 0]} rotation={[Math.PI / 2, 0, 0]} material={metal.casing}>
         <torusGeometry args={[3.04, 0.1, 8, 64]} />
       </mesh>
       <group name="VisualOnlyCoolingPlume" position={[0, 14.42, 0]}>
@@ -104,7 +166,7 @@ function CoolingTower() {
       </group>
       <Cylinder position={[0, 0.55, 0]} radius={4.55} length={0.56} material={metal.frameDark} radialSegments={52} />
       {[1.25, 3.05, 5.2, 7.3, 9.15, 10.6, 12.15, 13.6].map((y) => (
-        <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={metal.casingLight}>
+        <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={metal.casing}>
           <torusGeometry args={[towerRadiusAt(y), y === 7.3 ? 0.075 : 0.035, 7, 52]} />
         </mesh>
       ))}

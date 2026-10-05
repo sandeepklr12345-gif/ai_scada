@@ -8,32 +8,36 @@ const standard = (color: string, metalness = 0.45, roughness = 0.48) =>
   new THREE.MeshStandardMaterial({ color, metalness, roughness })
 
 export const metal = {
-  frame: standard('#818b8e', 0.28, 0.54),
-  frameDark: standard('#4b575b', 0.32, 0.58),
-  boilerFrame: standard('#ad4938', 0.3, 0.57),
-  boilerFrameDark: standard('#713a33', 0.28, 0.64),
-  platform: standard('#8b9190', 0.12, 0.72),
-  casing: standard('#bcc3c3', 0.48, 0.42),
-  casingLight: standard('#e0e3e1', 0.32, 0.46),
-  casingDark: standard('#4d585c', 0.46, 0.52),
+  frame: standard('#737d7d', 0.3, 0.62),
+  frameDark: standard('#394345', 0.32, 0.68),
+  boilerFrame: standard('#984435', 0.28, 0.66),
+  boilerFrameDark: standard('#653831', 0.28, 0.72),
+  platform: standard('#5d6665', 0.12, 0.82),
+  casing: standard('#747e80', 0.38, 0.56),
+  casingLight: standard('#a0a9a8', 0.28, 0.54),
+  casingDark: standard('#414c4f', 0.42, 0.62),
   furnace: standard('#514d48', 0.12, 0.84),
-  furnaceDoor: standard('#a44535', 0.26, 0.6),
-  coal: standard('#26292b', 0.06, 0.92),
-  belt: standard('#343a3c', 0.08, 0.9),
-  generator: standard('#3479a8', 0.32, 0.48),
-  concrete: standard('#a3a7a4', 0.02, 0.94),
-  water: standard('#318bb3', 0.28, 0.5),
-  waterReturn: standard('#78bad1', 0.24, 0.52),
-  steam: standard('#c8533e', 0.24, 0.5),
-  feedwater: standard('#b89358', 0.2, 0.58),
-  gas: standard('#687276', 0.24, 0.6),
-  tower: standard('#d0ccc0', 0.04, 0.95),
-  rail: standard('#c3c8c6', 0.18, 0.54),
+  furnaceDoor: standard('#8d4134', 0.24, 0.68),
+  coal: standard('#202425', 0.06, 0.96),
+  belt: standard('#2b3031', 0.08, 0.94),
+  generator: standard('#28648a', 0.34, 0.54),
+  concrete: standard('#666e6d', 0.02, 0.98),
+  water: standard('#159bc1', 0.3, 0.46),
+  waterReturn: standard('#3298b2', 0.26, 0.48),
+  steam: standard('#d64732', 0.26, 0.48),
+  feedwater: standard('#c8872c', 0.24, 0.56),
+  gas: standard('#535e61', 0.24, 0.68),
+  tower: standard('#85867f', 0.04, 0.97),
+  rail: standard('#929c9a', 0.16, 0.62),
 }
 
 export type BoxPlacement = { position: Vec3; size: Vec3; rotation?: Vec3 }
 export type CylinderPlacement = { position: Vec3; radius: number; length: number; rotation?: Vec3 }
 export type MemberPlacement = { from: Vec3; to: Vec3; width?: number; depth?: number }
+
+function instanceShade(index: number) {
+  return 0.94 + (Math.sin(index * 12.9898 + 78.233) * 0.5 + 0.5) * 0.12
+}
 
 export function InstancedBoxes({
   placements,
@@ -44,6 +48,7 @@ export function InstancedBoxes({
 }) {
   const instances = useRef<THREE.InstancedMesh>(null)
   const transform = useMemo(() => new THREE.Object3D(), [])
+  const instanceColor = useMemo(() => new THREE.Color(), [])
 
   useLayoutEffect(() => {
     const mesh = instances.current
@@ -54,10 +59,13 @@ export function InstancedBoxes({
       transform.scale.set(...size)
       transform.updateMatrix()
       mesh.setMatrixAt(index, transform.matrix)
+      const shade = instanceShade(index)
+      mesh.setColorAt(index, instanceColor.setRGB(shade, shade, shade))
     })
     mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
     mesh.computeBoundingSphere()
-  }, [placements, transform])
+  }, [placements, transform, instanceColor])
 
   if (placements.length === 0) return null
   return (
@@ -78,6 +86,7 @@ export function InstancedCylinders({
 }) {
   const instances = useRef<THREE.InstancedMesh>(null)
   const transform = useMemo(() => new THREE.Object3D(), [])
+  const instanceColor = useMemo(() => new THREE.Color(), [])
 
   useLayoutEffect(() => {
     const mesh = instances.current
@@ -88,10 +97,13 @@ export function InstancedCylinders({
       transform.scale.set(radius, length, radius)
       transform.updateMatrix()
       mesh.setMatrixAt(index, transform.matrix)
+      const shade = instanceShade(index)
+      mesh.setColorAt(index, instanceColor.setRGB(shade, shade, shade))
     })
     mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
     mesh.computeBoundingSphere()
-  }, [placements, transform])
+  }, [placements, transform, instanceColor])
 
   if (placements.length === 0) return null
   return (
@@ -229,6 +241,7 @@ export function InstancedMembers({
   const instances = useRef<THREE.InstancedMesh>(null)
   const transform = useMemo(() => new THREE.Object3D(), [])
   const up = useMemo(() => new THREE.Vector3(0, 1, 0), [])
+  const instanceColor = useMemo(() => new THREE.Color(), [])
 
   useLayoutEffect(() => {
     const mesh = instances.current
@@ -243,10 +256,13 @@ export function InstancedMembers({
       transform.scale.set(width, length, depth)
       transform.updateMatrix()
       mesh.setMatrixAt(index, transform.matrix)
+      const shade = instanceShade(index)
+      mesh.setColorAt(index, instanceColor.setRGB(shade, shade, shade))
     })
     mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
     mesh.computeBoundingSphere()
-  }, [placements, transform, up])
+  }, [placements, transform, up, instanceColor])
 
   if (placements.length === 0) return null
   return (
