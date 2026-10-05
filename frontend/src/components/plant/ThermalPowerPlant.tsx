@@ -17,6 +17,9 @@ import { Box, metal } from './industrial'
 const plantLabels = [
   { text: 'COAL', position: [-14.2, 4.35, 0] as [number, number, number] },
   { text: 'COAL MILL', position: [-10, 4.55, 0] as [number, number, number] },
+  { text: 'BOILER', position: [-3.5, 17.35, 0] as [number, number, number] },
+  { text: 'TURBINE', position: [6.2, 5.15, 0] as [number, number, number] },
+  { text: 'CONDENSER', position: [4.8, 3.7, 3.9] as [number, number, number] },
   { text: 'FEEDWATER PUMP', position: [0.25, 3.25, 8.2] as [number, number, number] },
   { text: 'GENERATOR', position: [12.8, 5.1, 0] as [number, number, number] },
   { text: 'COOLING SYSTEM', position: [11.2, 15.7, -9.5] as [number, number, number] },
