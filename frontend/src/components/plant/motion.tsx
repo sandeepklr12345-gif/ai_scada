@@ -49,12 +49,15 @@ export function FlowingParticles({
   useFrame(({ clock }) => {
     const mesh = instances.current
     if (!mesh) return
-    const time = clock.elapsedTime * speed * Math.max(0.15, drive)
+    // The route speed remains a visual parameter. Keep a visible, steady transit
+    // rate at the offline fallback so flow does not look frozen at low drive.
+    const time = clock.elapsedTime * speed * (0.85 + Math.max(0, drive) * 0.55)
     for (let i = 0; i < count; i += 1) {
       const progress = (i / count + time) % 1
       const point = curve.getPointAt(progress, sample).add(offsetVector)
       dummy.position.copy(point)
-      dummy.scale.setScalar(radius * (0.84 + 0.16 * Math.sin(progress * Math.PI * 2)))
+      const sizePulse = faceted ? 0.98 : 1.16
+      dummy.scale.setScalar(radius * (sizePulse + 0.12 * Math.sin(progress * Math.PI * 2)))
       if (faceted) {
         dummy.rotation.set(time * 0.8 + i, time * 0.55 + i * 0.7, time * 0.65 + i * 0.4)
       } else {
@@ -327,7 +330,7 @@ export function BurnerFlames({ drive = 0.55 }: { drive?: number }) {
   )
 }
 
-function createFireboxTexture() {
+function createFireboxTexture(seed = 8017) {
   const canvas = document.createElement('canvas')
   canvas.width = 96
   canvas.height = 144
@@ -338,7 +341,6 @@ function createFireboxTexture() {
   texture.magFilter = THREE.LinearFilter
   if (!context) return texture
 
-  let seed = 8017
   const random = () => {
     seed = (seed * 1664525 + 1013904223) >>> 0
     return seed / 4294967296
@@ -374,12 +376,17 @@ function createFireboxTexture() {
 }
 
 export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
-  const flameTexture = useMemo(createFireboxTexture, [])
+  const flameTextures = useMemo(
+    () => [createFireboxTexture(8017), createFireboxTexture(12931), createFireboxTexture(25403)],
+    [],
+  )
   const fireMaterials = useRef<Array<THREE.MeshStandardMaterial | null>>([])
   const coreMaterials = useRef<Array<THREE.MeshStandardMaterial | null>>([])
+  const lickMaterials = useRef<Array<THREE.MeshStandardMaterial | null>>([])
   const lights = useRef<Array<THREE.PointLight | null>>([])
   const flames = useRef<Array<THREE.Mesh | null>>([])
   const hotCores = useRef<Array<THREE.Mesh | null>>([])
+  const flameLicks = useRef<Array<THREE.Mesh | null>>([])
 
   useFrame(({ clock }) => {
     const time = clock.elapsedTime * (0.9 + drive * 0.22)
@@ -389,25 +396,43 @@ export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
         Math.sin(time * 8.3 + index * 2.4) * 0.32 +
         Math.sin(time * 12.7 + index * 0.8) * 0.18
       if (fireMaterials.current[index]) {
-        fireMaterials.current[index]!.emissiveIntensity = 1.7 + drive * 0.62 + flicker * 0.38
+        fireMaterials.current[index]!.emissiveIntensity = 1.85 + drive * 0.68 + flicker * 0.48
       }
       if (coreMaterials.current[index]) {
-        coreMaterials.current[index]!.emissiveIntensity = 2 + drive * 0.5 + flicker * 0.3
+        coreMaterials.current[index]!.emissiveIntensity = 2.2 + drive * 0.55 + flicker * 0.36
       }
       if (lights.current[index]) {
-        lights.current[index]!.intensity = 1.9 + drive * 0.72 + flicker * 0.42
+        lights.current[index]!.intensity = 2.15 + drive * 0.76 + flicker * 0.52
       }
       const flame = flames.current[index]
       if (flame) {
-        flame.scale.set(1 + flicker * 0.045, 1 + flicker * 0.055, 1)
-        flame.rotation.z = Math.sin(time * 2.8 + index * 1.6) * 0.025
+        flame.scale.set(1 + flicker * 0.1, 1 + flicker * 0.12, 1)
+        flame.position.x = Math.sin(time * 3.2 + index * 1.6) * 0.035
+        flame.position.y = Math.sin(time * 5.4 + index * 1.1) * 0.018
+        flame.rotation.z = Math.sin(time * 2.8 + index * 1.6) * 0.055
       }
       const hotCore = hotCores.current[index]
       if (hotCore) {
-        hotCore.scale.set(1 + flicker * 0.08, 1 + flicker * 0.07, 1)
-        hotCore.position.x = Math.sin(time * 4.1 + index) * 0.018
+        hotCore.scale.set(1 + flicker * 0.14, 1 + flicker * 0.12, 1)
+        hotCore.position.x = Math.sin(time * 4.1 + index) * 0.028
+        hotCore.position.y = -0.04 + Math.sin(time * 6.2 + index * 1.4) * 0.024
       }
     }
+    flameLicks.current.forEach((lick, index) => {
+      if (!lick) return
+      const wave = Math.sin(time * (7.1 + (index % 3) * 0.55) + index * 1.7)
+      const flutter = Math.sin(time * (11.4 + index * 0.23) + index * 0.9)
+      const side = index % 2 === 0 ? -1 : 1
+      lick.scale.set(1 + wave * 0.18, 1 + flutter * 0.2, 1)
+      lick.position.x = side * (0.145 + wave * 0.022)
+      lick.position.y = 0.06 + flutter * 0.04
+      lick.rotation.z = side * (0.1 + wave * 0.085)
+      const material = lickMaterials.current[index]
+      if (material) {
+        material.opacity = 0.68 + wave * 0.12
+        material.emissiveIntensity = 1.7 + drive * 0.48 + flutter * 0.32
+      }
+    })
   })
 
   return (
@@ -418,8 +443,8 @@ export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
             <planeGeometry args={[0.58, 0.94]} />
             <meshStandardMaterial
               ref={(material) => { fireMaterials.current[index] = material }}
-              map={flameTexture}
-              emissiveMap={flameTexture}
+              map={flameTextures[index]}
+              emissiveMap={flameTextures[index]}
               color="#fff0c4"
               emissive="#ff5a12"
               emissiveIntensity={2.05}
@@ -432,12 +457,40 @@ export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
               toneMapped={false}
             />
           </mesh>
+          {[-1, 1].map((side, lickIndex) => {
+            const materialIndex = index * 2 + lickIndex
+            return (
+              <mesh
+                key={`flame-lick-${side}`}
+                ref={(lick) => { flameLicks.current[materialIndex] = lick }}
+                position={[side * 0.145, 0.06, 0.019 + lickIndex * 0.001]}
+                rotation={[0, 0, side * 0.1]}
+              >
+                <planeGeometry args={[0.19, 0.5]} />
+                <meshStandardMaterial
+                  ref={(material) => { lickMaterials.current[materialIndex] = material }}
+                  map={flameTextures[index]}
+                  emissiveMap={flameTextures[index]}
+                  color="#ff9a3e"
+                  emissive="#ff5713"
+                  emissiveIntensity={1.9}
+                  roughness={0.92}
+                  metalness={0}
+                  transparent
+                  opacity={0.72}
+                  depthWrite={false}
+                  side={THREE.DoubleSide}
+                  toneMapped={false}
+                />
+              </mesh>
+            )
+          })}
           <mesh ref={(core) => { hotCores.current[index] = core }} position={[0, -0.04, 0.012]}>
             <planeGeometry args={[0.25, 0.72]} />
             <meshStandardMaterial
               ref={(material) => { coreMaterials.current[index] = material }}
-              map={flameTexture}
-              emissiveMap={flameTexture}
+              map={flameTextures[index]}
+              emissiveMap={flameTextures[index]}
               color="#fff0bb"
               emissive="#ffc538"
               emissiveIntensity={2.4}
