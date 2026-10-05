@@ -327,10 +327,59 @@ export function BurnerFlames({ drive = 0.55 }: { drive?: number }) {
   )
 }
 
+function createFireboxTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 96
+  canvas.height = 144
+  const context = canvas.getContext('2d')
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  if (!context) return texture
+
+  let seed = 8017
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0
+    return seed / 4294967296
+  }
+
+  context.globalCompositeOperation = 'lighter'
+  context.shadowBlur = 8
+  context.shadowColor = '#ff5a12'
+  for (let index = 0; index < 5; index += 1) {
+    const baseX = 10 + index * 18 + (random() - 0.5) * 8
+    const tipX = baseX + (random() - 0.5) * 17
+    const width = 10 + random() * 9
+    const height = 58 + random() * 62
+    const tipY = canvas.height - height
+    const gradient = context.createLinearGradient(baseX, canvas.height, tipX, tipY)
+    gradient.addColorStop(0, 'rgba(255,241,153,0.96)')
+    gradient.addColorStop(0.18, 'rgba(255,190,57,0.95)')
+    gradient.addColorStop(0.52, 'rgba(255,104,24,0.86)')
+    gradient.addColorStop(0.82, 'rgba(224,46,8,0.54)')
+    gradient.addColorStop(1, 'rgba(213,35,4,0)')
+    context.fillStyle = gradient
+    context.beginPath()
+    context.moveTo(baseX - width * 0.55, canvas.height)
+    context.bezierCurveTo(baseX - width * 0.9, canvas.height - height * 0.28, tipX - width * 0.8, tipY + height * 0.18, tipX, tipY)
+    context.bezierCurveTo(tipX + width * 0.65, tipY + height * 0.25, baseX + width * 0.85, canvas.height - height * 0.28, baseX + width * 0.55, canvas.height)
+    context.closePath()
+    context.fill()
+  }
+  context.shadowBlur = 0
+  context.globalCompositeOperation = 'source-over'
+  texture.needsUpdate = true
+  return texture
+}
+
 export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
+  const flameTexture = useMemo(createFireboxTexture, [])
   const fireMaterials = useRef<Array<THREE.MeshStandardMaterial | null>>([])
   const coreMaterials = useRef<Array<THREE.MeshStandardMaterial | null>>([])
   const lights = useRef<Array<THREE.PointLight | null>>([])
+  const flames = useRef<Array<THREE.Mesh | null>>([])
+  const hotCores = useRef<Array<THREE.Mesh | null>>([])
 
   useFrame(({ clock }) => {
     const time = clock.elapsedTime * (0.9 + drive * 0.22)
@@ -340,13 +389,23 @@ export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
         Math.sin(time * 8.3 + index * 2.4) * 0.32 +
         Math.sin(time * 12.7 + index * 0.8) * 0.18
       if (fireMaterials.current[index]) {
-        fireMaterials.current[index]!.emissiveIntensity = 1.65 + drive * 0.55 + flicker * 0.28
+        fireMaterials.current[index]!.emissiveIntensity = 1.7 + drive * 0.62 + flicker * 0.38
       }
       if (coreMaterials.current[index]) {
-        coreMaterials.current[index]!.emissiveIntensity = 1.3 + drive * 0.35 + flicker * 0.22
+        coreMaterials.current[index]!.emissiveIntensity = 2 + drive * 0.5 + flicker * 0.3
       }
       if (lights.current[index]) {
-        lights.current[index]!.intensity = 1.45 + drive * 0.62 + flicker * 0.27
+        lights.current[index]!.intensity = 1.9 + drive * 0.72 + flicker * 0.42
+      }
+      const flame = flames.current[index]
+      if (flame) {
+        flame.scale.set(1 + flicker * 0.045, 1 + flicker * 0.055, 1)
+        flame.rotation.z = Math.sin(time * 2.8 + index * 1.6) * 0.025
+      }
+      const hotCore = hotCores.current[index]
+      if (hotCore) {
+        hotCore.scale.set(1 + flicker * 0.08, 1 + flicker * 0.07, 1)
+        hotCore.position.x = Math.sin(time * 4.1 + index) * 0.018
       }
     }
   })
@@ -355,27 +414,39 @@ export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
     <group name="VisualOnlyFireboxGlow">
       {[-1.12, 0, 1.12].map((x, index) => (
         <group key={x} position={[x, 5.1, 2.69]}>
-          <mesh position={[0, 0, 0.005]}>
-            <planeGeometry args={[0.56, 0.9]} />
+          <mesh ref={(flame) => { flames.current[index] = flame }} position={[0, 0, 0.005]}>
+            <planeGeometry args={[0.58, 0.94]} />
             <meshStandardMaterial
               ref={(material) => { fireMaterials.current[index] = material }}
-              color="#76250d"
-              emissive="#ff4a0a"
-              emissiveIntensity={1.8}
+              map={flameTexture}
+              emissiveMap={flameTexture}
+              color="#fff0c4"
+              emissive="#ff5a12"
+              emissiveIntensity={2.05}
               roughness={0.92}
               metalness={0}
+              transparent
+              opacity={0.95}
+              depthWrite={false}
+              side={THREE.DoubleSide}
               toneMapped={false}
             />
           </mesh>
-          <mesh position={[0, -0.02, 0.012]}>
-            <planeGeometry args={[0.13, 0.72]} />
+          <mesh ref={(core) => { hotCores.current[index] = core }} position={[0, -0.04, 0.012]}>
+            <planeGeometry args={[0.25, 0.72]} />
             <meshStandardMaterial
               ref={(material) => { coreMaterials.current[index] = material }}
-              color="#d96b13"
-              emissive="#ffb526"
-              emissiveIntensity={1.5}
+              map={flameTexture}
+              emissiveMap={flameTexture}
+              color="#fff0bb"
+              emissive="#ffc538"
+              emissiveIntensity={2.4}
               roughness={0.9}
               metalness={0}
+              transparent
+              opacity={0.92}
+              depthWrite={false}
+              side={THREE.DoubleSide}
               toneMapped={false}
             />
           </mesh>
@@ -384,7 +455,7 @@ export function FireboxGlow({ drive = 0.55 }: { drive?: number }) {
             position={[0, 0, 0.12]}
             color="#ff7a2d"
             intensity={1.8}
-            distance={4.1}
+            distance={3.9}
             decay={2}
           />
         </group>
