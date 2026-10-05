@@ -1,4 +1,18 @@
-import { BoltedFlange, Box, Cylinder, Foundation, SelectionBounds, metal } from './industrial'
+import { BoltedFlange, Box, Cylinder, Foundation, InstancedCylinders, SelectionBounds, metal } from './industrial'
+import type { CylinderPlacement } from './industrial'
+
+const condenserTubeEnds: CylinderPlacement[] = [-1, 1].flatMap((side) =>
+  Array.from({ length: 60 }, (_, index) => {
+    const column = index % 15
+    const row = Math.floor(index / 15)
+    return {
+      position: [-2.8 + column * 0.4, 0.9 + row * 0.32, side * 2.25],
+      radius: 0.045,
+      length: 0.1,
+      rotation: [Math.PI / 2, 0, 0],
+    }
+  }),
+)
 
 export default function CondenserSystem({
   selected,
@@ -29,6 +43,7 @@ export default function CondenserSystem({
           <torusGeometry args={[0.79, 0.025, 6, 28]} />
         </mesh>
       )))}
+      <InstancedCylinders placements={condenserTubeEnds} material={metal.casingLight} radialSegments={10} />
       {[-3.2, 3.2].map((x) => (
         <group key={x}>
           <Box position={[x, 0.86, 0]} size={[0.34, 1.25, 4.65]} material={metal.frameDark} />

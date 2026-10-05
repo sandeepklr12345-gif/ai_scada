@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { Box, Cylinder, Foundation, Member, Pipe, SelectionBounds, metal, type Vec3 } from './industrial'
+import { Box, Cylinder, Foundation, InstancedBoxes, Member, Pipe, SelectionBounds, metal, type BoxPlacement, type Vec3 } from './industrial'
 import { FlowingParticles, VISUAL_ONLY_DRIVE } from './motion'
 
 const coalTransferRoute: Vec3[] = [
@@ -7,6 +7,18 @@ const coalTransferRoute: Vec3[] = [
   [-10.9, 4.03, 0],
   [-10.2, 4.02, 0],
 ]
+
+const coalPile: BoxPlacement[] = Array.from({ length: 20 }, (_, index) => {
+  const column = index % 5
+  const row = Math.floor(index / 5)
+  const height = 0.08 + (index % 3) * 0.035
+  const size: Vec3 = [0.2 + (index % 4) * 0.035, height, 0.17 + (index % 3) * 0.025]
+  return {
+    position: [-0.78 + column * 0.39 + (row % 2) * 0.05, 1.35 + height / 2, -0.66 + row * 0.44],
+    size,
+    rotation: [0, (index % 5) * 0.17, 0],
+  }
+})
 
 const hopperFunnel = (() => {
   const top = 1.3
@@ -43,6 +55,7 @@ function CoalHopper({ position, index }: { position: Vec3; index: number }) {
       <mesh position={[0, 0, 0]} geometry={hopperFunnel} material={metal.casing} castShadow receiveShadow />
       <Box position={[0, 1.34, 0]} size={[2.66, 0.18, 2.46]} material={metal.frameDark} />
       <Box position={[0, 1.24, 0]} size={[2.28, 0.22, 2.08]} material={metal.coal} />
+      <InstancedBoxes placements={coalPile} material={metal.coal} />
       <Box position={[0, 0.04, 0]} size={[0.66, 0.38, 0.6]} material={metal.frameDark} />
       {[-1, 1].flatMap((x) =>
         [-1, 1].map((z) => (
