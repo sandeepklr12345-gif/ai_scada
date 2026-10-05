@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
-import { Environment, Grid, OrbitControls } from '@react-three/drei'
+import { Environment, Grid, Html, OrbitControls } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import CoalHandlingSystem from './CoalSystem'
 import BoilerSystem from './BoilerSystem'
@@ -13,6 +13,41 @@ import ProcessPipes from './ProcessPipes'
 import TurbineSystem from './TurbineSystem'
 import type { EquipmentId, EquipmentSelection } from './equipment'
 import { Box, metal } from './industrial'
+
+const plantLabels = [
+  { text: 'COAL', position: [-14.2, 4.35, 0] as [number, number, number] },
+  { text: 'COAL MILL', position: [-10, 4.55, 0] as [number, number, number] },
+  { text: 'FEEDWATER PUMP', position: [0.25, 3.25, 8.2] as [number, number, number] },
+  { text: 'GENERATOR', position: [12.8, 5.1, 0] as [number, number, number] },
+  { text: 'COOLING SYSTEM', position: [11.2, 15.7, -9.5] as [number, number, number] },
+]
+
+function PlantLabels() {
+  return (
+    <group name="PlantSystemLabels">
+      {plantLabels.map(({ text, position }) => (
+        <Html key={text} position={position} center pointerEvents="none" zIndexRange={[3, 0]}>
+          <div
+            style={{
+              padding: '4px 7px',
+              border: '1px solid rgba(195, 219, 228, 0.62)',
+              borderRadius: 3,
+              color: '#f0f4f4',
+              background: 'rgba(13, 24, 30, 0.86)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.28)',
+              font: '600 9px/1.1 Inter, Arial, sans-serif',
+              letterSpacing: '0.08em',
+              whiteSpace: 'nowrap',
+              userSelect: 'none',
+            }}
+          >
+            {text}
+          </div>
+        </Html>
+      ))}
+    </group>
+  )
+}
 
 function PlantControls() {
   const controls = useRef<OrbitControlsImpl>(null)
@@ -146,6 +181,7 @@ function ThermalPowerPlant({
         infiniteGrid
       />
       <PlantModel selected={selection} setSelected={onSelectionChange} />
+      <PlantLabels />
       <PlantControls />
     </Canvas>
   )
