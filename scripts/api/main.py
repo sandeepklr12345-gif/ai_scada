@@ -129,7 +129,66 @@ decision_engine = DecisionSupportEngine()
 # ------------------------------------------------------------
 
 postgres_storage = PostgreSQLStorage()
+# ------------------------------------------------------------
+# 4.6 DSS DECISION EVENT PERSISTENCE
+# ------------------------------------------------------------
 
+def persist_dss_decision_event(
+    timestamp,
+    decision,
+    source_id=1,
+    equipment_id=3,
+):
+    """
+    Persist non-normal DSS decisions into alarms_events.
+
+    LEVEL_1 / AUTOMATIC:
+        No event is persisted.
+
+    LEVEL_2 / APPROVAL_REQUIRED:
+        Persist as WARNING / PENDING_REVIEW.
+
+    LEVEL_3 / HUMAN_ONLY:
+        Persist as CRITICAL / PENDING_REVIEW.
+    """
+
+    if decision.decision_level == "LEVEL_1":
+        return None
+
+    if decision.decision_level == "LEVEL_2":
+        alarm_code = "DSS_LEVEL_2"
+        severity = "WARNING"
+
+    elif decision.decision_level == "LEVEL_3":
+        alarm_code = "DSS_LEVEL_3"
+        severity = "CRITICAL"
+
+    else:
+        raise ValueError(
+            f"Unsupported DSS decision level: "
+            f"{decision.decision_level}"
+        )
+
+    description = (
+        f"DSS decision: {decision.decision_level}; "
+        f"action={decision.action}; "
+        f"reason={decision.reason}; "
+        f"anomaly_score={decision.anomaly_score}; "
+        f"predicted_attack_mechanism="
+        f"{decision.predicted_attack_mechanism}; "
+        f"classifier_score={decision.classifier_score}"
+    )
+
+    return postgres_storage.save_alarm(
+        timestamp=timestamp,
+        source_id=source_id,
+        equipment_id=equipment_id,
+        event_type="DSS_DECISION",
+        alarm_code=alarm_code,
+        severity=severity,
+        status="PENDING_REVIEW",
+        description=description,
+    )
 
 # ============================================================
 # 5. REQUEST MODELS
@@ -500,7 +559,16 @@ def decision(request: DecisionRequest):
             decision_input
         )
     )
+    # --------------------------------------------------------
+    # PERSIST DSS DECISION EVENT
+    # --------------------------------------------------------
 
+    decision_event_id = persist_dss_decision_event(
+        timestamp=pd.Timestamp.now().to_pydatetime(),
+        decision=decision_result,
+        source_id=1,
+        equipment_id=3,
+    )
 
     # --------------------------------------------------------
     # RESPONSE
@@ -539,6 +607,7 @@ def decision(request: DecisionRequest):
             ),
 
             "anomaly_state": anomaly_state,
+            "decision_event_id": decision_event_id,
         },
     }
 
