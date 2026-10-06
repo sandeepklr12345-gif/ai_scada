@@ -398,7 +398,80 @@ class PostgreSQLStorage:
             if connection is not None:
                 connection.close()
 
+    # --------------------------------------------------------
+    # GET RECENT ALARMS / EVENTS
+    # --------------------------------------------------------
 
+    def get_recent_alarms(
+        self,
+        source_id=None,
+        equipment_id=None,
+        event_type=None,
+        limit=20,
+    ):
+        connection = None
+
+        try:
+            connection = self._connect()
+
+            query = """
+                SELECT
+                    event_id,
+                    timestamp,
+                    source_id,
+                    equipment_id,
+                    event_type,
+                    alarm_code,
+                    severity,
+                    status,
+                    description
+                FROM alarms_events
+                WHERE 1 = 1
+            """
+
+            params = []
+
+            if source_id is not None:
+                query += " AND source_id = %s"
+                params.append(source_id)
+
+            if equipment_id is not None:
+                query += " AND equipment_id = %s"
+                params.append(equipment_id)
+
+            if event_type is not None:
+                query += " AND event_type = %s"
+                params.append(event_type)
+
+            query += """
+                ORDER BY timestamp DESC, event_id DESC
+                LIMIT %s;
+            """
+
+            params.append(int(limit))
+
+            with connection.cursor() as cursor:
+                cursor.execute(query, tuple(params))
+                rows = cursor.fetchall()
+
+            return [
+                {
+                    "event_id": row[0],
+                    "timestamp": row[1],
+                    "source_id": row[2],
+                    "equipment_id": row[3],
+                    "event_type": row[4],
+                    "alarm_code": row[5],
+                    "severity": row[6],
+                    "status": row[7],
+                    "description": row[8],
+                }
+                for row in rows
+            ]
+
+        finally:
+            if connection is not None:
+                connection.close()
 # ============================================================
 # SELF TEST
 # ============================================================

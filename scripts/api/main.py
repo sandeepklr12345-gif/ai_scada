@@ -657,3 +657,24 @@ def predictions_latest():
         "status": "success",
         "predictions": predictions,
     }
+
+# ------------------------------------------------------------
+# 8.3 RECENT DSS DECISION HISTORY
+# ------------------------------------------------------------
+
+@app.get("/decision/history")
+def decision_history():
+
+    events = (
+        postgres_storage.get_recent_alarms(
+            source_id=1,
+            equipment_id=3,
+            event_type="DSS_DECISION",
+            limit=20,
+        )
+    )
+
+    return {
+        "status": "success",
+        "events": events,
+    }
