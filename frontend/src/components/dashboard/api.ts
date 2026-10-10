@@ -56,11 +56,40 @@ export type PredictionsResponse = {
   predictions: Prediction[]
 }
 
+export type DecisionEvent = {
+  event_id: number
+  timestamp: string
+  source_id: number
+  equipment_id: number
+  event_type: string
+  alarm_code: string
+  severity: string
+  status: string
+  description: string
+}
+
+export type DecisionHistoryResponse = {
+  status: string
+  events: DecisionEvent[]
+}
+
+export type Raw600MwResponse = {
+  status: string
+  available: boolean
+  source?: string
+  timestamp?: string
+  step?: number
+  feature_count?: number
+  features: Record<string, number>
+}
+
 export type ApiSnapshot = {
   connection: 'checking' | 'online' | 'offline'
   models: ModelCatalog | null
   runtime: RuntimeResponse | null
   predictions: PredictionsResponse | null
+  decisionHistory: DecisionHistoryResponse | null
+  raw600mw: Raw600MwResponse | null
   checkedAt: Date | null
 }
 
@@ -92,6 +121,8 @@ export function useApiSnapshot() {
     models: null,
     runtime: null,
     predictions: null,
+    decisionHistory: null,
+    raw600mw: null,
     checkedAt: null,
   })
 
@@ -112,6 +143,8 @@ export function useApiSnapshot() {
         modelsResult,
         runtimeResult,
         predictionsResult,
+        decisionHistoryResult,
+        raw600mwResult,
       ] = await Promise.allSettled([
         getJson<{ status?: string }>(
           '/health',
@@ -130,6 +163,16 @@ export function useApiSnapshot() {
 
         getJson<PredictionsResponse>(
           '/predictions/latest',
+          controller.signal,
+        ),
+
+        getJson<DecisionHistoryResponse>(
+          '/decision/history',
+          controller.signal,
+        ),
+
+        getJson<Raw600MwResponse>(
+          '/runtime/raw',
           controller.signal,
         ),
       ])
@@ -162,6 +205,16 @@ export function useApiSnapshot() {
             ? predictionsResult.value
             : null,
 
+        decisionHistory:
+          decisionHistoryResult.status === 'fulfilled'
+            ? decisionHistoryResult.value
+            : null,
+
+        raw600mw:
+          raw600mwResult.status === 'fulfilled'
+            ? raw600mwResult.value
+            : null,
+
         checkedAt: new Date(),
       })
     }
@@ -170,7 +223,7 @@ export function useApiSnapshot() {
 
     const interval = window.setInterval(() => {
       void refresh()
-    }, 15000)
+    }, 1000)
 
     return () => {
       active = false

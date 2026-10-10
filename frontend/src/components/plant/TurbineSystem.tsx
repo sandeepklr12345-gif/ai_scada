@@ -1,34 +1,99 @@
-import { useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import {
   Box,
   Cylinder,
   Foundation,
-  InstancedBoxes,
   InstancedCylinders,
   SelectionBounds,
   metal,
-  type BoxPlacement,
   type CylinderPlacement,
 } from './industrial'
 import { VISUAL_ONLY_DRIVE } from './motion'
 
-const bladeAngles = Array.from({ length: 12 }, (_, index) => (index / 12) * Math.PI * 2)
 const turbineStages = [
   { x: -2.3, radius: 0.88, length: 2.1 },
   { x: -0.5, radius: 1.1, length: 2.2 },
   { x: 1.45, radius: 1.35, length: 2.55 },
 ]
 const rotorStagePositions = [-2.25, -0.7, 0.8, 2.15]
+const rotorBladeRows = [
+  { outerRadius: 0.66, chord: 0.48, count: 18 },
+  { outerRadius: 0.78, chord: 0.43, count: 20 },
+  { outerRadius: 0.94, chord: 0.38, count: 22 },
+  { outerRadius: 1.1, chord: 0.34, count: 24 },
+]
 
-const rotorBladePlacements: BoxPlacement[][] = rotorStagePositions.map((_, stage) =>
-  bladeAngles.map((angle) => ({
-    position: [0, Math.cos(angle) * (0.58 + stage * 0.055), Math.sin(angle) * (0.58 + stage * 0.055)],
-    size: [0.15, 0.78 + stage * 0.12, 0.09],
-    rotation: [angle, 0, 0],
-  })),
-)
+function createTurbineBladeGeometry(outerRadius: number, chord: number) {
+  const geometry = new THREE.BufferGeometry()
+  const radialSegments = 6
+  const chordSegments = 3
+  const rootRadius = 0.31
+  const bladeSpan = outerRadius - rootRadius
+  const positions: number[] = []
+  const indices: number[] = []
+  const surfaceVertexCount = (radialSegments + 1) * (chordSegments + 1)
+
+  for (const side of [-1, 1]) {
+    const vertexOffset = positions.length / 3
+    for (let radial = 0; radial <= radialSegments; radial += 1) {
+      const t = radial / radialSegments
+      const radius = rootRadius + bladeSpan * t
+      const localChord = chord * (0.72 + 0.28 * Math.sin(Math.PI * t))
+      const sweep = 0.08 * t
+      const thickness = 0.018 * (1 - 0.45 * t)
+
+      for (let section = 0; section <= chordSegments; section += 1) {
+        const u = section / chordSegments
+        const chordOffset = u - 0.5
+        const camber = Math.sin(u * Math.PI) * 0.065 * (1 - 0.3 * t)
+        positions.push(
+          sweep + chordOffset * localChord,
+          radius,
+          camber + side * thickness,
+        )
+      }
+    }
+
+    for (let radial = 0; radial < radialSegments; radial += 1) {
+      for (let section = 0; section < chordSegments; section += 1) {
+        const a = vertexOffset + radial * (chordSegments + 1) + section
+        const b = a + chordSegments + 1
+        if (side > 0) indices.push(a, b, a + 1, b, b + 1, a + 1)
+        else indices.push(a, a + 1, b, b, a + 1, b + 1)
+      }
+    }
+  }
+
+  // Close the root, tip, leading edge, and trailing edge so each blade has a
+  // real, shaded thickness when the rotor turns through the cutaway casing.
+  const backOffset = surfaceVertexCount
+  const addBridge = (frontIndex: number, backIndex: number, nextFront: number, nextBack: number) => {
+    indices.push(frontIndex, nextFront, backIndex, nextFront, nextBack, backIndex)
+  }
+  for (let section = 0; section < chordSegments; section += 1) {
+    const frontRoot = section
+    const backRoot = backOffset + section
+    addBridge(frontRoot, backRoot, frontRoot + 1, backRoot + 1)
+    const frontTip = radialSegments * (chordSegments + 1) + section
+    const backTip = backOffset + frontTip
+    addBridge(frontTip + 1, backTip + 1, frontTip, backTip)
+  }
+  for (let radial = 0; radial < radialSegments; radial += 1) {
+    const frontLeading = radial * (chordSegments + 1)
+    const backLeading = backOffset + frontLeading
+    addBridge(frontLeading + chordSegments + 1, backLeading + chordSegments + 1, frontLeading, backLeading)
+    const frontTrailing = frontLeading + chordSegments
+    const backTrailing = backLeading + chordSegments
+    addBridge(frontTrailing, backTrailing, frontTrailing + chordSegments + 1, backTrailing + chordSegments + 1)
+  }
+
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  geometry.setIndex(indices)
+  geometry.computeVertexNormals()
+  return geometry
+}
 
 const casingBoltPlacements: CylinderPlacement[] = turbineStages.flatMap(({ x, radius, length }) =>
   [-length / 2, length / 2].flatMap((offset) =>
@@ -93,11 +158,47 @@ function TurbineRotor() {
       />
       {rotorStagePositions.map((x, stage) => (
         <group key={x} position={[x, 0, 0]} name={`RotorBladeStage-${stage + 1}`}>
-          <InstancedBoxes placements={rotorBladePlacements[stage]} material={metal.casingLight} />
-          <Cylinder position={[0, 0, 0]} radius={0.52 + stage * 0.08} length={0.18} material={metal.frameDark} rotation={[0, 0, Math.PI / 2]} />
+          <AxialRotorBladeRow {...rotorBladeRows[stage]} />
+          <Cylinder position={[0, 0, 0]} radius={0.43 + stage * 0.035} length={0.2} material={metal.frameDark} rotation={[0, 0, Math.PI / 2]} radialSegments={32} />
+          <Cylinder position={[0.12, 0, 0]} radius={0.36 + stage * 0.03} length={0.055} material={metal.casingLight} rotation={[0, 0, Math.PI / 2]} radialSegments={32} />
         </group>
       ))}
     </group>
+  )
+}
+
+function AxialRotorBladeRow({ outerRadius, chord, count }: (typeof rotorBladeRows)[number]) {
+  const instances = useRef<THREE.InstancedMesh>(null)
+  const geometry = useMemo(() => createTurbineBladeGeometry(outerRadius, chord), [outerRadius, chord])
+
+  useLayoutEffect(() => {
+    const mesh = instances.current
+    if (!mesh) return
+    const transform = new THREE.Object3D()
+    for (let index = 0; index < count; index += 1) {
+      transform.rotation.set((index / count) * Math.PI * 2, 0, 0)
+      transform.updateMatrix()
+      mesh.setMatrixAt(index, transform.matrix)
+    }
+    mesh.instanceMatrix.needsUpdate = true
+    mesh.computeBoundingSphere()
+  }, [count])
+
+  return (
+    <instancedMesh
+      ref={instances}
+      args={[geometry, undefined, count]}
+      castShadow
+      receiveShadow
+      name="CurvedAxialTurbineBlades"
+    >
+      <meshStandardMaterial
+        color="#bac3c2"
+        metalness={0.82}
+        roughness={0.31}
+        side={THREE.DoubleSide}
+      />
+    </instancedMesh>
   )
 }
 

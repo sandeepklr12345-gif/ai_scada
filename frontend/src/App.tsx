@@ -276,7 +276,7 @@ function App() {
 
             <AiSystemStatus api={api} />
 
-            <RecentAlerts />
+            <RecentAlerts api={api} />
           </aside>
         </div>
       </section>
