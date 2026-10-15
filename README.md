@@ -24,7 +24,7 @@ Historical 600 MW replay CSV
 
 The adapter reads the replay timestamp and the 71 exact raw source fields. It does not use the replay CSV's already engineered lag or time fields as builder inputs. The FastAPI `/forecast` route receives only the generated 119-feature dictionary. The MQTT subscriber writes the original power measurement and the three forecast outputs after a successful forecast response.
 
-The broader API also exposes HAI anomaly analysis, decision support, and latest-record PostgreSQL reads. The React frontend polls `/health` and `/models` for service and model status; it does not call `/runtime/latest` or `/predictions/latest`. Those API reads return stored records and do not establish a live plant feed. The frontend does not receive MQTT status, database status, alert history, or decision history, and its plant view and panels show unavailable or empty values.
+The broader API exposes HAI anomaly analysis, decision support, and latest-record PostgreSQL reads. The React frontend polls `/health`, `/models`, `/runtime/latest`, `/predictions/latest`, `/decision/history`, and `/runtime/raw` approximately once per second. These endpoints provide API status and replay/runtime data; polling them does not establish live physical SCADA ingestion. The dashboard displays available runtime values and decision-support events, while MQTT and database status indicators and several SCADA time-series panels remain unavailable or incomplete.
 
 ## 600 MW power forecasting
 
@@ -167,7 +167,7 @@ The repository also contains attack-label, temporal classifier, calibration, sce
 
 ## React frontend
 
-The `frontend/` directory contains the React dashboard and interactive plant view. The dashboard checks API health and model information. It does not call the API's latest measurement or prediction endpoints, and it shows that live measurements, MQTT status, database status, alert history, and live time series are unavailable. Parameter and chart panels remain placeholders until an appropriate data feed is connected.
+The `frontend/` directory contains the React dashboard and interactive plant view. It polls API health, model information, latest runtime records, predictions, decision history, and raw 600 MW telemetry approximately once per second. The displayed values depend on data available through the API and may come from historical replay; this is not proof of live physical SCADA ingestion. MQTT and database status indicators and several live time-series panels remain unavailable or incomplete.
 
 ## Validation and testing
 
@@ -234,4 +234,4 @@ The requirements cover the implemented Python API, frozen model inference, data 
 - The 600 MW forecasting models are frozen and infer from exactly 119 runtime-built features; runtime retraining is not implemented.
 - HAI Candidate C and attack-classifier results are research and dataset validation. They are not a validated plant-fault detector or an operationally validated attack-probability service.
 - Decision support returns a level and action label. It does not autonomously control plant equipment.
-- The React frontend has no live measurement, MQTT, database, alert-history, or decision-history feed from the current API.
+- The React frontend polls the API for runtime records, forecasts, raw 600 MW telemetry, and decision history approximately once per second. This supports replay-backed dashboard updates, not verified live physical SCADA ingestion; MQTT/database status indicators and several live time-series panels remain incomplete.
